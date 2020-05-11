@@ -1,0 +1,8 @@
+[0m[01;32mlibfreetype-6.dll[0m*
+[01;32mlibpng15-15.dll[0m*
+[01;32mSDL.dll[0m*
+[01;32mSDL_image.dll[0m*
+[01;32mSDL_mixer.dll[0m*
+[01;32mSDL_net.dll[0m*
+[01;32mSDL_ttf.dll[0m*
+[01;32mzlib1.dll[0m*
