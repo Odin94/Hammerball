@@ -1,0 +1,49 @@
+- use fix ports for every client (eg client 2 has 8123, client 3 has 8134 and so on)
+
+
+- splattereffect on death (blood particles)
+- speed / dmg powerups
+- some sort of hitting animation
+- active abilities like slow/blink/shield/magnet
+- different characters with different abilities/health/dmgpower
+- maps changeable with txtfile  (numbers in .txt => tiles) - autodownload map of host (if "mapname.txt" doesnt exist, ask for tcp transmition)
+- screenshake whenever the ball hits sth
+- stop-frame when ball hits player
+- dangerous terrain: slowfields, teleporters, speedways
+- minimap
+- Geist/ball ist (einzige)lichtquelle
+
+
+Bugs/Errors:
+
+- ball decelerates unnaturally due to decel being individual for x and y instead of their vector length
+- the closer to the ball you are, the less hard you hit (due to the fact that hit-strength is distance(player, ball))
+
+- program crashes when you run it twice and hit "h" on the second instance (no input on 1st)
+- program freezes when you run it and press "j" before establishing a server
+- If you move the screen during a Mulitplayer session the UDP-packets seem to get delayed (quite heavily)
+- multiplayer >2 players: only one hitspampreventor for all players, might cause probs
+
+
+
+//slippery tiles code:
+
+
+	if(velcapx != 0)
+	{
+		velx += velcapx* (deltaT/60.f * deltaT/500);
+	}
+	if(velcapy != 0)
+	{
+		vely += velcapy* (deltaT/60.f * deltaT/500);
+	}
+
+	//Deceleration
+	if(velcapx == 0 && velx > 0)
+	{
+		velx -= velcapx* (deltaT/60.f * deltaT/500);
+	}
+	if(velcapy == 0 && vely > 0)
+	{
+		vely -= velcapy* (deltaT/60.f * deltaT/500);
+	}

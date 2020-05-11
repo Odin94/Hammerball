@@ -1,0 +1,42 @@
+Trying to hit the ball has 500ms cooldown
+
+Entering "local" in as IP Address allows to play local MP (WASD + Space vs arrowkeys + mouse)
+
+Hit-range is 120 x and y distance between player center and ball center
+
+Sprite size is 66x66
+
+if the game closes immediately upon launching, check the stdout.txt - if it says that Settings.txt was missing and was created it should start now.
+If Settings.txt still doesn't exist it's possible that the program doesn't have write access. Run in admin mode or create Settings.txt manually (as described below)
+
+Don't move the window after starting a multiplayer session. It will create a (gamebreaking) delay.
+
+
+
+standard host port is 8133
+client1:  			  8134
+client2:              8135
+client3:              8136
+
+Settings.txt:
+
+IP:
+<ip here>
+<amount of players in MP here>
+<your playerposition (1-4) here>
+
+
+
+
+Example:
+IP:
+localhost
+2
+1
+
+<or>
+
+IP:
+186.127.3.1
+2
+2

@@ -1,0 +1,6 @@
+ScreenWidth(Scale always 16:10):
+1600
+IP:
+localhost
+2
+1

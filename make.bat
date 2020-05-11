@@ -1,0 +1,1 @@
+g++ -o Hammerball.exe HammerMain.cpp Utility.cpp Actors.cpp Timer.cpp Tile.cpp StringInput.cpp Rotozoom.c -static -lmingw32 -lSDLmain -lSDL.dll -lSDL_image -lSDL_mixer -lSDL_ttf -lSDL_net

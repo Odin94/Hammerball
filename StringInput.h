@@ -1,0 +1,38 @@
+#ifndef StringInput_H
+#define StringInput_H
+
+
+#include "SDL/SDL.h"
+#include "SDL/SDL_ttf.h"
+#include <string>
+
+class StringInput
+{
+    private:
+    
+    SDL_Surface *mainscreen;
+    
+    int SCREEN_WIDTH;
+    int SCREEN_HEIGHT;
+
+    TTF_Font * font;
+
+    public:
+
+    //The storage string
+    std::string str;
+
+    //determine if string has changed
+    bool rerenderpls;
+
+    //Initializes variables
+    StringInput(SDL_Surface *screen, int w, int h);
+    
+    //Does clean up
+    ~StringInput();
+    
+    //Handles input
+    void handle_input(SDL_Event event); 
+};
+
+#endif
