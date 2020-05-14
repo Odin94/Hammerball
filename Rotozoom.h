@@ -27,7 +27,7 @@ extern "C" {
 #ifndef M_PI
 #define M_PI    3.141592654
 #endif
-#include "SDL/SDL.h"
+#include <SDL.h>
         /* ---- Defines */
 #define SMOOTHING_OFF           0
 #define SMOOTHING_ON            1

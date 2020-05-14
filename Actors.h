@@ -2,7 +2,7 @@
 #ifndef Actor_H
 #define Actor_H
 
-#include "SDL/SDL.h"
+#include <SDL.h>
 #include "Timer.h"
 #include "Tile.h"
 
