@@ -6,154 +6,138 @@
 #include "Timer.h"
 #include "Tile.h"
 
-class Actor{
+class Actor {
 
-	public:
+  public:
+    // rect
+    int x;
+    int y;
+    int w;
+    int h;
 
-		//rect
-		int x;
-		int y;
-		int w;
-		int h;
+    int powerup; // not needed, but without this the ball.gethit function will
+                 // cry   (le uber poor design face)
 
-		int powerup;   //not needed, but without this the ball.gethit function will cry   (le uber poor design face)
+    float velcapx;
+    float velcapy;
 
-		float velcapx;
-		float velcapy;
+    float velx;
+    float vely;
 
-		float velx;
-		float vely;
+    int health;
+    int invultime;
+    int invulcounter;
+    bool invuln;
 
-		int health;
-		int invultime;
-		int invulcounter;
-		bool invuln;
+    bool alive;
 
-		bool alive;
+    bool inBallRange;
 
-		bool inBallRange;
+    int damage;
 
-		int damage;
+    SDL_Rect clip_rect;
 
-		SDL_Rect clip_rect;
+    int statictime2nextframe;
+    int time2nextframe; // dynamic; depends on movementspeed / speedcap
+    int timeinthisframe;
+    int framecounter;
+    int maxframes;
 
-		int statictime2nextframe;
-		int time2nextframe;     //dynamic; depends on movementspeed / speedcap
-		int timeinthisframe;
-		int framecounter;
-		int maxframes;
+    int direction; // 0  = left, 1 = right
 
-		int direction; //0  = left, 1 = right
+    Actor();
 
-		Actor();
+    void set(int x, int y, int w, int h, int velx, int vely);
 
-		void set(int x, int y, int w, int h,int velx, int vely);
+    void move(int time, EventTile BTiles[][15], int ballx = 0, int bally = 0,
+              bool lethal = false);
 
-		void move(int time, EventTile BTiles[][15], int ballx = 0, int bally = 0, bool lethal = false);
+    void invul(int invultime);
 
-		void invul(int invultime);
-
-		void takeDamage(int dmg, Actor source);
-
+    void takeDamage(int dmg, Actor source);
 };
 
-class Player : public Actor
-{
-	public:
+class Player : public Actor {
+  public:
+    int speedup;
+    int powerup;
 
-		int speedup;
-		int powerup;
+    int speedupcap;
+    int powerupcap;
 
-		int speedupcap;
-		int powerupcap;
+    Player();
 
-		Player();
-
-		void shoot();
-
+    void shoot();
 };
 
-class Ball : public Actor
-{
-	public:
+class Ball : public Actor {
+  public:
+    bool lethal;
+    float time1;
 
-		bool lethal;
-		float time1;
+    Ball();
 
-		Ball();
+    void move(int deltaT, EventTile Btiles[][15]);
 
-		void move(int deltaT, EventTile Btiles[][15]);
-
-		void getHit(Actor source);
-		
-
+    void getHit(Actor source);
 };
 
-class Upgrade : public Actor
-{
-	public:
+class Upgrade : public Actor {
+  public:
+    char type;
+    bool active;
 
-		char type;
-		bool active;
-
-		Upgrade();
+    Upgrade();
 };
 
-class AI : public Actor
-{
-	public:
+class AI : public Actor {
+  public:
+    Timer hitspampreventor;
 
-		Timer hitspampreventor;
+    AI();
 
-		AI();
+    void setDirection(Ball *ball, Player player);
 
-		void setDirection(Ball *ball, Player player);
+    void hitball(Ball *ball);
 
-		void hitball(Ball *ball);
-
-		void update(Ball *ball, Player player, int deltaT, EventTile BTiles[][15]);
+    void update(Ball *ball, Player player, int deltaT, EventTile BTiles[][15]);
 };
 
+class Enemy : public Actor {
+  public:
+    bool active;
 
-class Enemy : public Actor
-{
-	public:
+    Enemy();
 
-		bool active;
+    void setEnemy(int x, int y, int maxframes, int time2nextframe,
+                  int dmg = 10);
 
-		Enemy();
+    void move(int time, Actor player, EventTile BTiles[][15]);
 
-		void setEnemy(int x, int y, int maxframes, int time2nextframe, int dmg = 10);
-		
-		void move(int time, Actor player, EventTile BTiles[][15]);
-
-		void shoot();
+    void shoot();
 };
 
+class Bullet : public Actor {
+  public:
+    // rect
+    int x;
+    int y;
+    int w;
+    int h;
 
-class Bullet : public Actor
-{
-	public: 
+    int velx;
+    int vely;
 
-		//rect
-		int x;
-		int y;
-		int w;
-		int h;
+    bool active;
 
-		int velx;
-		int vely;
+    bool splash;
+    bool penetrating;
 
-		bool active;
+    Bullet();
 
-		bool splash;
-		bool penetrating;
+    void setBullet(int xz, int y, int mousex, int mousey);
 
-		Bullet();
-
-		void setBullet(int xz, int y, int mousex, int mousey);
-
-		void move(int time);
+    void move(int time);
 };
 
 #endif

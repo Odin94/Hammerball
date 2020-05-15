@@ -3,32 +3,32 @@
 // uses ms
 
 class Timer {
-public:
-  // The clock time when the timer started
-  int startTicks;
+  public:
+    // The clock time when the timer started
+    int startTicks;
 
-  // The ticks stored when the timer was paused
-  int pausedTicks;
+    // The ticks stored when the timer was paused
+    int pausedTicks;
 
-  // The timer status
-  bool paused;
-  bool started;
+    // The timer status
+    bool paused;
+    bool started;
 
-  // Initializes variables
-  Timer();
+    // Initializes variables
+    Timer();
 
-  // The various clock actions
-  void start();
-  void stop();
-  void pause();
-  void unpause();
+    // The various clock actions
+    void start();
+    void stop();
+    void pause();
+    void unpause();
 
-  // Gets the timer's time
-  int get_ticks();
+    // Gets the timer's time
+    int get_ticks();
 
-  // Checks the status of the timer
-  bool is_started();
-  bool is_paused();
+    // Checks the status of the timer
+    bool is_started();
+    bool is_paused();
 };
 
 #endif
