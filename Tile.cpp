@@ -14,9 +14,8 @@ void Tile::update(int deltaT) {
                 framecounter = 0;
             }
 
-            clip_rect.y =
-                66 * (framecounter % (maxframes + 1)) +
-                framecounter; // 4 tiles per row in tilesheet //67 134 201 268
+            // 4 tiles per row in tilesheet //67 134 201 268
+            clip_rect.y = 66 * (framecounter % (maxframes + 1)) + framecounter;
             if (clip_rect.y < 20) {
                 clip_rect.y = 0;
             }
@@ -34,9 +33,8 @@ void Tile::update(int deltaT) {
     }
 }
 
-void Tile::set(int x, int y, int w, int h, int dmgfr, int dmgfrdmg, int img,
-               int maxframes, int time2nextframe, bool traversable,
-               bool active) {
+void Tile::set(int x, int y, int w, int h, int dmgfr, int dmgfrdmg, int img, int maxframes,
+               int time2nextframe, bool traversable, bool active) {
     this->x = x;
     this->y = y;
     this->w = w;
@@ -56,9 +54,7 @@ void Tile::set(int x, int y, int w, int h, int dmgfr, int dmgfrdmg, int img,
     damage = 0;
 }
 
-void EventTile::generateTime() {
-    TimeTillEvent = rand() % (maxTime - minTime + 1) + minTime;
-}
+void EventTile::generateTime() { TimeTillEvent = rand() % (maxTime - minTime + 1) + minTime; }
 
 void EventTile::update(int deltaT) {
     if (EventActive) {
@@ -92,8 +88,7 @@ void EventTile::update(int deltaT) {
                 framecounter = 0;
                 WaitingForReset = false;
                 EventActive = false;
-                clip_rect.y =
-                    66 * (framecounter % (maxframes + 1)) + framecounter;
+                clip_rect.y = 66 * (framecounter % (maxframes + 1)) + framecounter;
             }
         }
     } else {
@@ -114,12 +109,10 @@ void EventTile::update(int deltaT) {
     }
 }
 
-void EventTile::setE(int x, int y, int w, int h, int dmgfr, int dmgfrdmg,
-                     int img, int maxframes, int time2nextframe,
-                     bool traversable, bool active, int minTime, int maxTime,
+void EventTile::setE(int x, int y, int w, int h, int dmgfr, int dmgfrdmg, int img, int maxframes,
+                     int time2nextframe, bool traversable, bool active, int minTime, int maxTime,
                      int TimeTillReset) {
-    set(x, y, w, h, dmgfr, dmgfrdmg, img, maxframes, time2nextframe,
-        traversable, active);
+    set(x, y, w, h, dmgfr, dmgfrdmg, img, maxframes, time2nextframe, traversable, active);
     this->minTime = minTime;
     this->maxTime = maxTime;
     this->TimeTillReset = TimeTillReset;
@@ -135,7 +128,6 @@ void EventTile::setE(int x, int y, int w, int h, int dmgfr, int dmgfrdmg,
 
 Tile EventTile::toTile() {
     Tile returnTile;
-    returnTile.set(x, y, w, h, dmgframe, dmgframedmg, img, maxframes,
-                   time2nextframe, traversable, active);
+    returnTile.set(x, y, w, h, dmgframe, dmgframedmg, img, maxframes, time2nextframe, traversable, active);
     return returnTile;
 }

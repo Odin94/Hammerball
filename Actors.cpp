@@ -66,8 +66,7 @@ void Actor::invul(int invultim) {
     invultime = invultim;
 }
 
-void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally,
-                 bool lethal) {
+void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally, bool lethal) {
     // Acceleration:  .25sec to reach velcap; /250 to turn .25sec into ms
     if (velcapx != 0) {
         velx += velcapx * (deltaT / 200.f);
@@ -111,28 +110,22 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally,
     // check walls
 
     if (vely > 0) {
-        if (!BTiles[int(ceil((x + w) / 64))][int((y + h) / 64)].traversable &&
-            y + h > BTiles[int((x + w) / 64)][int(ceil(y / 64 + h))].y) {
+        if (!BTiles[int(ceil((x + w) / 64))][int((y + h) / 64)].traversable && y + h > BTiles[int((x + w) / 64)][int(ceil(y / 64 + h))].y) {
             y = BTiles[int((x + w) / 64)][int(ceil((y + h) / 64))].y - h - 1;
         }
 
-        if (!BTiles[int(ceil(x / 64))][int((y + h) / 64)].traversable &&
-            y + h > BTiles[int(x / 64)][int(ceil(y / 64 + h))].y) {
+        if (!BTiles[int(ceil(x / 64))][int((y + h) / 64)].traversable && y + h > BTiles[int(x / 64)][int(ceil(y / 64 + h))].y) {
             y = BTiles[int(x / 64)][int(ceil((y + h) / 64))].y - h - 1;
         }
     }
 
     if (vely < 0) {
-        if (!BTiles[int(floor((x + w) / 64))][int(y / 64)].traversable &&
-            y < BTiles[int(floor((x + w) / 64))][int(y / 64)].y +
-                    BTiles[int(floor((x + w) / 64))][int(y / 64)].h) {
+        if (!BTiles[int(floor((x + w) / 64))][int(y / 64)].traversable && y < BTiles[int(floor((x + w) / 64))][int(y / 64)].y + BTiles[int(floor((x + w) / 64))][int(y / 64)].h) {
             y = BTiles[int(floor((x + w) / 64))][int(y / 64)].y +
                 BTiles[int(floor((x + w) / 64))][int(y / 64)].h + 1;
         }
 
-        if (!BTiles[int(floor(x / 64))][int(y / 64)].traversable &&
-            y < BTiles[int(floor(x / 64))][int(y / 64)].y +
-                    BTiles[int(floor(x / 64))][int(y / 64)].h) {
+        if (!BTiles[int(floor(x / 64))][int(y / 64)].traversable && y < BTiles[int(floor(x / 64))][int(y / 64)].y + BTiles[int(floor(x / 64))][int(y / 64)].h) {
             y = BTiles[int(floor(x / 64))][int(y / 64)].y +
                 BTiles[int(floor(x / 64))][int(y / 64)].h + 1;
         }
@@ -149,28 +142,22 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally,
     }
 
     if (velx > 0) {
-        if (!BTiles[int(ceil((x + w) / 64))][int((y + h) / 64)].traversable &&
-            x + w > BTiles[int(ceil(x + w) / 64)][int((y + h) / 64)].x) {
+        if (!BTiles[int(ceil((x + w) / 64))][int((y + h) / 64)].traversable && x + w > BTiles[int(ceil(x + w) / 64)][int((y + h) / 64)].x) {
             x = BTiles[int(ceil((x + w) / 64))][int((y + h) / 64)].x - w - 1;
         }
 
-        if (!BTiles[int(ceil((x + w) / 64))][int(y / 64)].traversable &&
-            x + w > BTiles[int(ceil(x + w) / 64)][int(y / 64)].x) {
+        if (!BTiles[int(ceil((x + w) / 64))][int(y / 64)].traversable && x + w > BTiles[int(ceil(x + w) / 64)][int(y / 64)].x) {
             x = BTiles[int(ceil((x + w) / 64))][int((y) / 64)].x - w - 1;
         }
     }
 
     if (velx < 0) {
-        if (!BTiles[int(floor(x / 64))][int((y + h) / 64)].traversable &&
-            x < BTiles[int(floor(x / 64))][int((y + h) / 64)].x +
-                    BTiles[int(floor(x / 64))][int((y + h) / 64)].w) {
+        if (!BTiles[int(floor(x / 64))][int((y + h) / 64)].traversable && x < BTiles[int(floor(x / 64))][int((y + h) / 64)].x + BTiles[int(floor(x / 64))][int((y + h) / 64)].w) {
             x = BTiles[int(ceil(x / 64))][int((y + h) / 64)].x +
                 BTiles[int(ceil(x / 64))][int((y + h) / 64)].w;
         }
 
-        if (!BTiles[int(floor(x / 64))][int(y / 64)].traversable &&
-            x < BTiles[int(floor(x / 64))][int(y / 64)].x +
-                    BTiles[int(floor(x / 64))][int(y / 64)].w) {
+        if (!BTiles[int(floor(x / 64))][int(y / 64)].traversable && x < BTiles[int(floor(x / 64))][int(y / 64)].x + BTiles[int(floor(x / 64))][int(y / 64)].w) {
             x = BTiles[int(ceil(x / 64))][int(y / 64)].x +
                 BTiles[int(ceil(x / 64))][int(y / 64)].w;
         }
@@ -178,9 +165,7 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally,
 
     // check collision with ball
     if (!lethal && ballx != 0) {
-        if (abs(x + w / 2 - (ballx + w / 2)) < w &&
-            abs(y + h / 2 - (bally + h / 2)) <
-                h) // if ball and player intersect  x + w/2 -= ballx+w/2 - x+w/2
+        if (abs(x + w / 2 - (ballx + w / 2)) < w && abs(y + h / 2 - (bally + h / 2)) < h) // if ball and player intersect  x + w/2 -= ballx+w/2 - x+w/2
         {
             x -= 0.1 * ((ballx + w / 2) - (x + w / 2));
             y -= 0.1 * ((bally + h / 2) - (y + h / 2));
@@ -243,17 +228,15 @@ void Ball::move(int deltaT, EventTile Btiles[][15]) {
     bool didcollide = false;
     for (int i = 0; i < 25; i++) {
         for (int j = 0; j < 15; j++) {
-            if (!Btiles[i][j].traversable &&
-                checkCollision(x + velx * (deltaT / 60.f), y, h, w,
-                               Btiles[i][j].x, Btiles[i][j].y, Btiles[i][j].w,
-                               Btiles[i][j].h)) {
+            if (!Btiles[i][j].traversable && checkCollision(x + velx * (deltaT / 60.f), y, h, w,
+                                                            Btiles[i][j].x, Btiles[i][j].y, Btiles[i][j].w,
+                                                            Btiles[i][j].h)) {
                 velx = -velx;
                 didcollide = true;
             }
-            if (!Btiles[i][j].traversable &&
-                checkCollision(x, y + vely * (deltaT / 60.f), h, w,
-                               Btiles[i][j].x, Btiles[i][j].y, Btiles[i][j].w,
-                               Btiles[i][j].h)) {
+            if (!Btiles[i][j].traversable && checkCollision(x, y + vely * (deltaT / 60.f), h, w,
+                                                            Btiles[i][j].x, Btiles[i][j].y, Btiles[i][j].w,
+                                                            Btiles[i][j].h)) {
                 vely = -vely;
                 didcollide = true;
             }
@@ -271,26 +254,23 @@ void Ball::move(int deltaT, EventTile Btiles[][15]) {
 
     // make the ball slow down by itself with time
     // TODO: Make deceleration affect the vector length; right now the ball
-    // moves unnaturally if velx hits 0 while y is still > 0
-    time1 += deltaT; // in ms
+    // moves unnaturally if velx hits 0 while y is still > 0 in ms
+    time1 += deltaT;
     if (time1 >= 100) {
 
         // Decel with vectorlength
         float veclength = abs(velx) * abs(vely);
 
         if (velx > 0) {
-            if (velx < 1) // if velx is between 0 and 1; checked so we dont
-                          // swing between -.5 and +.5 or sth
-            {
+            if (velx < 1) { // if velx is between 0 and 1; checked so we dont swing between -.5 and +.5 or sth
                 velx = 0;
             } else {
                 velx--;
             }
 
         } else if (velx < 0) {
-            if (velx > -1) // if velx is between 0 and -1; checked so we dont
-                           // swing between -.5 and +.5 or sth
-            {
+            if (velx > -1) { // if velx is between 0 and -1; checked so we dont swing between -.5 and +.5 or sth
+
                 velx = 0;
             } else {
                 velx++;
@@ -298,18 +278,14 @@ void Ball::move(int deltaT, EventTile Btiles[][15]) {
         }
 
         if (vely > 0) {
-            if (vely < 1) // if vely is between 0 and -1; checked so we dont
-                          // swing between -.5 and +.5 or sth
-            {
+            if (vely < 1) { // if vely is between 0 and -1; checked so we dont swing between -.5 and +.5 or sth
                 vely = 0;
             } else {
                 vely--;
             }
 
         } else if (vely < 0) {
-            if (vely > -1) // if vely is between 0 and -1; checked so we dont
-                           // swing between -.5 and +.5 or sth
-            {
+            if (vely > -1) { // if vely is between 0 and -1; checked so we dont swing between -.5 and +.5 or sth
                 vely = 0;
             } else {
                 vely++;
@@ -484,34 +460,24 @@ void Enemy::move(int deltaT, Actor player, EventTile BTiles[][15]) {
 
     // check walls
     if (velx > 0) {
-        if (!BTiles[int(ceil((x + w) / 64))][int((y + h / 2) / 64)]
-                 .traversable &&
-            x + w > BTiles[int(ceil(x / 64 + w))][int((y + y / 2) / 64)].x) {
+        if (!BTiles[int(ceil((x + w) / 64))][int((y + h / 2) / 64)].traversable && x + w > BTiles[int(ceil(x / 64 + w))][int((y + y / 2) / 64)].x) {
             x = BTiles[int(ceil((x + w) / 64))][int((y + h / 2) / 64)].x - w;
         }
     }
     if (velx < 0) {
-        if (!BTiles[int(floor(x / 64))][int((y + h / 2) / 64)].traversable &&
-            x < BTiles[int(floor(x / 64))][int((y + h / 2) / 64)].x +
-                    BTiles[int(floor(x / 64))][int((y + h / 2) / 64)].w) {
-            x = BTiles[int(ceil(x / 64))][int((y + h / 2) / 64)].x +
-                BTiles[int(ceil(x / 64))][int((y + h / 2) / 64)].w;
+        if (!BTiles[int(floor(x / 64))][int((y + h / 2) / 64)].traversable && x < BTiles[int(floor(x / 64))][int((y + h / 2) / 64)].x + BTiles[int(floor(x / 64))][int((y + h / 2) / 64)].w) {
+            x = BTiles[int(ceil(x / 64))][int((y + h / 2) / 64)].x + BTiles[int(ceil(x / 64))][int((y + h / 2) / 64)].w;
         }
     }
 
     if (vely > 0) {
-        if (!BTiles[int(ceil((x + w / 2) / 64))][int((y + h) / 64)]
-                 .traversable &&
-            y + h > BTiles[int((x + w / 2) / 64)][int(ceil(y / 64 + h))].y) {
+        if (!BTiles[int(ceil((x + w / 2) / 64))][int((y + h) / 64)].traversable && y + h > BTiles[int((x + w / 2) / 64)][int(ceil(y / 64 + h))].y) {
             y = BTiles[int((x + w / 2) / 64)][int(ceil((y + h) / 64))].y - h;
         }
     }
     if (vely < 0) {
-        if (!BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].traversable &&
-            y < BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].y +
-                    BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].h) {
-            y = BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].y +
-                BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].h;
+        if (!BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].traversable && y < BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].y + BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].h) {
+            y = BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].y + BTiles[int(floor((x + w / 2) / 64))][int(y / 64)].h;
         }
     }
 
@@ -525,8 +491,7 @@ void Enemy::move(int deltaT, Actor player, EventTile BTiles[][15]) {
                     framecounter = 0;
                 }
 
-                clip_rect.x = 33 * (framecounter % 10) +
-                              1; // 10 tiles per row in tilesheet
+                clip_rect.x = 33 * (framecounter % 10) + 1; // 10 tiles per row in tilesheet
                 if (clip_rect.x == 1) {
                     clip_rect.x = 0;
                 }
@@ -608,8 +573,7 @@ void AI::setDirection(Ball *ball, Player player) {
 
 void AI::hitball(Ball *ball) {
     if (!hitspampreventor.started || hitspampreventor.get_ticks() > 500) {
-        if (abs(x + w / 2 - (ball->x + ball->w / 2)) <= 120 &&
-            abs(y + h / 2 - (ball->y + ball->h / 2)) <= 120) {
+        if (abs(x + w / 2 - (ball->x + ball->w / 2)) <= 120 && abs(y + h / 2 - (ball->y + ball->h / 2)) <= 120) {
             ball->getHit(*this);
             hitspampreventor.start();
         }

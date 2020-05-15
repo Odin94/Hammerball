@@ -257,48 +257,35 @@ void init() {
     font = TTF_OpenFont("res/Demonized.ttf", 28);
     fontSmall = TTF_OpenFont("res/Demonized.ttf", 12);
 
-    screen =
-        SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale,
-                         SCREEN_BPP, SDL_SWSURFACE);
+    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE);
 
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096); // init mixer
 
-    ATile_ground =
-        rotozoomSurface(load_image("res/ground.png"), 0, drawscale, 0);
+    ATile_ground = rotozoomSurface(load_image("res/ground.png"), 0, drawscale, 0);
     BTile_Wall = rotozoomSurface(load_image("res/Wall.png"), 0, drawscale, 0);
-    FallingTile =
-        rotozoomSurface(load_image("res/falltile.png"), 0, drawscale, 0);
+    FallingTile = rotozoomSurface(load_image("res/falltile.png"), 0, drawscale, 0);
 
-    PlayerSprite =
-        rotozoomSurface(load_image("res/Ironman.png"), 0, drawscale, 0);
-    PlayerDead =
-        rotozoomSurface(load_image("res/PlayerDead.png"), 0, drawscale, 0);
+    PlayerSprite = rotozoomSurface(load_image("res/Ironman.png"), 0, drawscale, 0);
+    PlayerDead = rotozoomSurface(load_image("res/PlayerDead.png"), 0, drawscale, 0);
 
     TitleScreen = rotozoomSurface(load_image("res/Title.png"), 0, drawscale, 0);
-    HostingScreen =
-        rotozoomSurface(load_image("res/Hosting.png"), 0, drawscale, 0);
-    ClientScreen =
-        rotozoomSurface(load_image("res/Client.png"), 0, drawscale, 0);
-    SettingsBG =
-        rotozoomSurface(load_image("res/Settings.png"), 0, drawscale, 0);
+    HostingScreen = rotozoomSurface(load_image("res/Hosting.png"), 0, drawscale, 0);
+    ClientScreen = rotozoomSurface(load_image("res/Client.png"), 0, drawscale, 0);
+    SettingsBG = rotozoomSurface(load_image("res/Settings.png"), 0, drawscale, 0);
 
     SpeedUp = rotozoomSurface(load_image("res/SpeedUp.png"), 0, drawscale, 0);
     PowerUp = rotozoomSurface(load_image("res/PowerUp.png"), 0, drawscale, 0);
 
-    HealthBar =
-        rotozoomSurface(load_image("res/healthbar.png"), 0, drawscale, 0);
-    HealthBarFrame =
-        rotozoomSurface(load_image("res/HealthBarFrame.png"), 0, drawscale, 0);
+    HealthBar = rotozoomSurface(load_image("res/healthbar.png"), 0, drawscale, 0);
+    HealthBarFrame = rotozoomSurface(load_image("res/HealthBarFrame.png"), 0, drawscale, 0);
 
     BallLethal = rotozoomSurface(load_image("res/Ball.png"), 0, drawscale, 0);
-    BallNonLethal =
-        rotozoomSurface(load_image("res/Ballnonlethal.png"), 0, drawscale, 0);
+    BallNonLethal = rotozoomSurface(load_image("res/Ballnonlethal.png"), 0, drawscale, 0);
 
     Borders = rotozoomSurface(load_image("res/Borders.png"), 0, drawscale, 0);
 
     TEST = rotozoomSurface(load_image("res/asphaltdecal.png"), 0, drawscale, 0);
-    TEST2 =
-        rotozoomSurface(load_image("res/asphaltdecal2.png"), 0, drawscale, 0);
+    TEST2 = rotozoomSurface(load_image("res/asphaltdecal2.png"), 0, drawscale, 0);
 
     string xxy = "";
     text = TTF_RenderText_Solid(font, xxy.c_str(), textColor);
@@ -309,9 +296,7 @@ void init() {
     surfaces[1] = BTile_Spikes;
     surfaces[2] = BTile_Wall;
     surfaces[3] = FallingTile;
-    // score = TTF_RenderUTF8_Shaded(font, toString(travelled).c_str(),
-    // textColor,
-    // bgcolor);
+    // score = TTF_RenderUTF8_Shaded(font, toString(travelled).c_str(), textColor, bgcolor);
 
     bulletcounter = 0; // counts how many player-bullets are on the field
     enemycounter = 0;  // counts enemies
@@ -354,9 +339,7 @@ void initStage() {
 
             int *mpc = charAToIntA(separateString(mapContent, 10, ","), 10);
 
-            ATiles[i][j].setE(i * 64, j * 64, 64, 64, mpc[0], mpc[1], mpc[2],
-                              mpc[3], mpc[4], mpc[5] != 0, mpc[6] != 0, mpc[7],
-                              mpc[8], mpc[9]);
+            ATiles[i][j].setE(i * 64, j * 64, 64, 64, mpc[0], mpc[1], mpc[2], mpc[3], mpc[4], mpc[5] != 0, mpc[6] != 0, mpc[7], mpc[8], mpc[9]);
 
             if (ATiles[i][j].img == FALLING_TILE) {
                 ATiles[i][j].generateTime();
@@ -365,21 +348,18 @@ void initStage() {
 
             mapContent.clear();
 
-            BTiles[i][j].setE(i * 64, j * 64, 64, 64, -1, 0, -1, 0, 1, true,
-                              true, 0, 0, 0);
+            BTiles[i][j].setE(i * 64, j * 64, 64, 64, -1, 0, -1, 0, 1, true, true, 0, 0, 0);
             BTiles[i][j].clip_rect.x = 0;
             BTiles[i][j].clip_rect.y = 0;
         }
     }
     map.close();
 
-    ATiles[11][12].setE(11 * 64, 12 * 64, 64, 64, 8, 1, FALLING_TILE, 9, 100,
-                        true, true, 2000, 3000, 2500);
+    ATiles[11][12].setE(11 * 64, 12 * 64, 64, 64, 8, 1, FALLING_TILE, 9, 100, true, true, 2000, 3000, 2500);
     ATiles[11][12].generateTime();
     ATiles[11][12].clip_rect.x = 0;
 
-    ATiles[11][11].setE(11 * 64, 11 * 64, 64, 64, 8, 1, FALLING_TILE, 9, 250,
-                        true, true, 2000, 3000, 2500);
+    ATiles[11][11].setE(11 * 64, 11 * 64, 64, 64, 8, 1, FALLING_TILE, 9, 250, true, true, 2000, 3000, 2500);
     ATiles[11][11].generateTime();
     ATiles[11][11].clip_rect.x = 0;
 }
@@ -403,35 +383,24 @@ void draw() {
         for (int i = 0; i < 25; i++) {
             for (int j = 0; j < 15; j++) {
                 if (ATiles[i][j].active) {
-                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y,
-                                  surfaces[ATiles[i][j].img], screen,
-                                  &ATiles[i][j].clip_rect);
+                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, surfaces[ATiles[i][j].img], screen, &ATiles[i][j].clip_rect);
                 }
-                if (ATiles[i][j]
-                        .needsBorder) // check if borders from top, left, right
-                                      // or bottom need to be drawn
-                {
+                if (ATiles[i][j].needsBorder) { // check if borders from top, left, right or bottom need to be drawn
                     if (!ATiles[i - 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y,
-                                      Borders, screen, 0, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, screen, 0, 0, 64, 64);
                     }
                     if (!ATiles[i + 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y,
-                                      Borders, screen, 67, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, screen, 67, 0, 64, 64);
                     }
                     if (!ATiles[i][j - 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y,
-                                      Borders, screen, 134, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, screen, 134, 0, 64, 64);
                     }
                     if (!ATiles[i][j + 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y,
-                                      Borders, screen, 201, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, screen, 201, 0, 64, 64);
                     }
                 }
                 if (BTiles[i][j].active) {
-                    apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y,
-                                  surfaces[BTiles[i][j].img], screen,
-                                  &BTiles[i][j].clip_rect);
+                    apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y, surfaces[BTiles[i][j].img], screen, &BTiles[i][j].clip_rect);
                 }
             }
         }
@@ -447,33 +416,27 @@ void draw() {
 
         if (!multiplayer && !localmultiplayer) {
             if (ai.alive) {
-                apply_surface(drawscale, ai.x, ai.y, PlayerSprite, screen,
-                              &ai.clip_rect);
+                apply_surface(drawscale, ai.x, ai.y, PlayerSprite, screen, &ai.clip_rect);
             } else {
                 apply_surface(drawscale, ai.x, ai.y, PlayerDead, screen);
             }
         }
 
         if (player.alive) {
-            apply_surface(drawscale, player.x, player.y, PlayerSprite, screen,
-                          &player.clip_rect);
+            apply_surface(drawscale, player.x, player.y, PlayerSprite, screen, &player.clip_rect);
         } else {
             apply_surface(drawscale, player.x, player.y, PlayerDead, screen);
         }
         if (multiplayer || localmultiplayer) {
             if (player2.alive) {
-                apply_surface(drawscale, player2.x, player2.y, PlayerSprite,
-                              screen, &player2.clip_rect);
+                apply_surface(drawscale, player2.x, player2.y, PlayerSprite, screen, &player2.clip_rect);
             } else {
-                apply_surface(drawscale, player2.x, player2.y, PlayerDead,
-                              screen);
+                apply_surface(drawscale, player2.x, player2.y, PlayerDead, screen);
             }
             if (playercount > 2 && player3.alive) {
-                apply_surface(drawscale, player3.x, player3.y, PlayerSprite,
-                              screen, &player3.clip_rect);
+                apply_surface(drawscale, player3.x, player3.y, PlayerSprite, screen, &player3.clip_rect);
                 if (playercount > 3 && player4.alive) {
-                    apply_surface(drawscale, player4.x, player4.y, PlayerSprite,
-                                  screen, &player4.clip_rect);
+                    apply_surface(drawscale, player4.x, player4.y, PlayerSprite, screen, &player4.clip_rect);
                 }
             }
         }
@@ -490,8 +453,7 @@ void draw() {
         apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBarFrame, screen);
 
         healthrect.w = 105 - (100 - player.health);
-        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBar, screen,
-                      &healthrect);
+        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBar, screen, &healthrect);
 
         //    apply_surface(64*5, 64*5, TEST, screen);
         //   apply_surface(64*2,64*2, TEST2, screen);
@@ -572,8 +534,7 @@ void handleMP() // TCP introduction makes both sides crash when moving the
         }
 
         // SEND
-        sstream.str(
-            ""); // reset stream to empty TODO: send information to all players
+        sstream.str(""); // reset stream to empty TODO: send information to all players
         sstream << player.x << "," << player.y << "," << ball.x << "," << ball.y
                 << "," << islethal << "," << hitball << "," << player2.x << ","
                 << player2.y << "," << player3.x << "," << player3.y << ","
@@ -601,12 +562,10 @@ void handleMP() // TCP introduction makes both sides crash when moving the
     } else {
         // SEND
         sstream.str(""); // reset stream to empty
-        sstream << playernumber << "," << player.x << "," << player.y << ","
-                << hitball << "," << player.alive << "\0";
+        sstream << playernumber << "," << player.x << "," << player.y << "," << hitball << "," << player.alive << "\0";
         string result = sstream.str();
 
-        if (SDLNet_TCP_Send(TCPClient, result.c_str(),
-                            strlen(result.c_str()) + 1) < 1) {
+        if (SDLNet_TCP_Send(TCPClient, result.c_str(), strlen(result.c_str()) + 1) < 1) {
             printf("SDLNet_CheckSockets: %s\n", SDLNet_GetError());
         }
 
@@ -674,19 +633,13 @@ void update(Uint32 delta) {
     if (player.alive) {
         player.move(delta, ATiles, ball.x, ball.y, ball.lethal);
 
-        if (abs(player.x + player.w / 2 - (ball.x + ball.w / 2)) <= 120 &&
-            abs(player.y + player.h / 2 - (ball.y + ball.h / 2)) <= 120) {
+        if (abs(player.x + player.w / 2 - (ball.x + ball.w / 2)) <= 120 && abs(player.y + player.h / 2 - (ball.y + ball.h / 2)) <= 120) {
             player.inBallRange = true;
         } else {
             player.inBallRange = false;
         }
 
-        if (BTiles[(player.x + player.w / 2) / 64][(player.y + player.h / 2) /
-                                                   64]
-                    .damage > 0 ||
-            ATiles[(player.x + player.w / 2) / 64][(player.y + player.h / 2) /
-                                                   64]
-                    .damage > 0) {
+        if (BTiles[(player.x + player.w / 2) / 64][(player.y + player.h / 2) / 64].damage > 0 || ATiles[(player.x + player.w / 2) / 64][(player.y + player.h / 2) / 64].damage > 0) {
             player.alive = false;
         }
     }
@@ -694,8 +647,7 @@ void update(Uint32 delta) {
     if (localmultiplayer && player2.alive) {
         player2.move(delta, ATiles, ball.x, ball.y, ball.lethal);
 
-        if (abs(player2.x + player2.w / 2 - (ball.x + ball.w / 2)) <= 120 &&
-            abs(player2.y + player2.h / 2 - (ball.y + ball.h / 2)) <= 120) {
+        if (abs(player2.x + player2.w / 2 - (ball.x + ball.w / 2)) <= 120 && abs(player2.y + player2.h / 2 - (ball.y + ball.h / 2)) <= 120) {
             // player2.clip_rect.x = 67;
         } else {
             player2.clip_rect.x = 0;
@@ -712,8 +664,7 @@ void update(Uint32 delta) {
 
     // UPGRADE STUFF
     if (!upgrade.active &&
-        UpgradeSpawner.get_ticks() >
-            10000) // if 10sec since last upgrade got taken
+        UpgradeSpawner.get_ticks() > 10000) // if 10sec since last upgrade got taken
     {
         int ux = 0; // rand() % 25;
         int uy = rand() % 15;
@@ -737,8 +688,7 @@ void update(Uint32 delta) {
     }
 
     if (upgrade.active) {
-        if (abs(player.x + player.w / 2 - (upgrade.x + upgrade.w / 2)) < 58 &&
-            abs(player.y + player.h / 2 - (upgrade.y + upgrade.h / 2)) < 58) {
+        if (abs(player.x + player.w / 2 - (upgrade.x + upgrade.w / 2)) < 58 && abs(player.y + player.h / 2 - (upgrade.y + upgrade.h / 2)) < 58) {
             upgrade.active = false;
             if (upgrade.type == 's') {
                 if (player.speedup < player.speedupcap) {
@@ -752,10 +702,7 @@ void update(Uint32 delta) {
             }
         }
         if (multiplayer || localmultiplayer) {
-            if (abs(player2.x + player2.w / 2 - (upgrade.x + upgrade.w / 2)) <
-                    58 &&
-                abs(player2.y + player2.h / 2 - (upgrade.y + upgrade.h / 2)) <
-                    58) {
+            if (abs(player2.x + player2.w / 2 - (upgrade.x + upgrade.w / 2)) < 58 && abs(player2.y + player2.h / 2 - (upgrade.y + upgrade.h / 2)) < 58) {
                 upgrade.active = false;
                 if (upgrade.type = 's') {
                     if (player2.speedup < player2.speedupcap) {
@@ -769,10 +716,7 @@ void update(Uint32 delta) {
                 }
             }
             if (playercount > 2) {
-                if (abs(player3.x + player3.w / 2 -
-                        (upgrade.x + upgrade.w / 2)) < 58 &&
-                    abs(player3.y + player3.h / 2 -
-                        (upgrade.y + upgrade.h / 2)) < 58) {
+                if (abs(player3.x + player3.w / 2 - (upgrade.x + upgrade.w / 2)) < 58 && abs(player3.y + player3.h / 2 - (upgrade.y + upgrade.h / 2)) < 58) {
                     upgrade.active = false;
                     if (upgrade.type = 's') {
                         if (player3.speedup < player3.speedupcap) {
@@ -786,10 +730,7 @@ void update(Uint32 delta) {
                     }
                 }
                 if (playercount > 3) {
-                    if (abs(player4.x + player4.w / 2 -
-                            (upgrade.x + upgrade.w / 2)) < 58 &&
-                        abs(player4.y + player4.h / 2 -
-                            (upgrade.y + upgrade.h / 2)) < 58) {
+                    if (abs(player4.x + player4.w / 2 - (upgrade.x + upgrade.w / 2)) < 58 && abs(player4.y + player4.h / 2 - (upgrade.y + upgrade.h / 2)) < 58) {
                         upgrade.active = false;
                         if (upgrade.type = 's') {
                             if (player4.speedup < player4.speedupcap) {
@@ -816,8 +757,7 @@ void update(Uint32 delta) {
             ai.update(&ball, player, delta, ATiles);
         }
 
-        if (ball.lethal && checkCollision(ai.x, ai.y, ai.w, ai.h, ball.x,
-                                          ball.y, ball.w, ball.h)) {
+        if (ball.lethal && checkCollision(ai.x, ai.y, ai.w, ai.h, ball.x, ball.y, ball.w, ball.h)) {
             ai.alive = false;
         }
     }
@@ -831,15 +771,12 @@ void update(Uint32 delta) {
     }
 
     // check for hit-by-ball
-    if (ball.lethal && checkCollision(player.x, player.y, player.w, player.h,
-                                      ball.x, ball.y, ball.w, ball.h)) {
+    if (ball.lethal && checkCollision(player.x, player.y, player.w, player.h, ball.x, ball.y, ball.w, ball.h)) {
         player.alive = false;
     }
 
     if (localmultiplayer) {
-        if (ball.lethal &&
-            checkCollision(player2.x, player2.y, player2.w, player2.h, ball.x,
-                           ball.y, ball.w, ball.h)) {
+        if (ball.lethal && checkCollision(player2.x, player2.y, player2.w, player2.h, ball.x, ball.y, ball.w, ball.h)) {
             player2.alive = false;
         }
     }
@@ -862,8 +799,7 @@ void run() {
             }
 
             if (event.type == SDL_VIDEORESIZE) {
-                screen = SDL_SetVideoMode(event.resize.w, event.resize.h, 32,
-                                          SDL_HWSURFACE | SDL_RESIZABLE);
+                screen = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_HWSURFACE | SDL_RESIZABLE);
             }
 
             if (event.type == SDL_KEYDOWN) {
@@ -871,15 +807,13 @@ void run() {
                     if (inputcounter == 0) {
                         StrIn.handle_input(event);
                         if (StrIn.rerenderpls) {
-                            text = TTF_RenderText_Solid(font, StrIn.str.c_str(),
-                                                        textColor);
+                            text = TTF_RenderText_Solid(font, StrIn.str.c_str(), textColor);
                             StrIn.rerenderpls = false;
                         }
                     } else if (inputcounter == 1) {
                         StrInName.handle_input(event);
                         if (StrInName.rerenderpls) {
-                            name = TTF_RenderText_Solid(
-                                font, StrInName.str.c_str(), textColor);
+                            name = TTF_RenderText_Solid(font, StrInName.str.c_str(), textColor);
                             StrInName.rerenderpls = false;
                         }
                     }
@@ -893,15 +827,13 @@ void run() {
                             inputcounter++;
                         } else if (inputcounter == 1) {
                             if (StrIn.str.length() > 0) {
-                                SDLNet_ResolveHost(&address, StrIn.str.c_str(),
-                                                   8134);
+                                SDLNet_ResolveHost(&address, StrIn.str.c_str(), 8134);
                                 connectionIP = StrIn.str;
                                 if (StrIn.str == "local") {
                                     localmultiplayer = true;
                                 }
                             }
-                            name = TTF_RenderText_Solid(
-                                fontSmall, StrInName.str.c_str(), textColor);
+                            name = TTF_RenderText_Solid(fontSmall, StrInName.str.c_str(), textColor);
                             inputdone = true;
                         }
                     }
@@ -923,15 +855,10 @@ void run() {
                     }
                     break;
                 case SDLK_c:
-                    screen = SDL_SetVideoMode(
-                        SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale,
-                        SCREEN_BPP,
-                        SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
+                    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
                     break;
                 case SDLK_v:
-                    screen = SDL_SetVideoMode(
-                        SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale,
-                        SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
+                    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
                     break;
 
                 case SDLK_h:
@@ -962,18 +889,14 @@ void run() {
                         }
                     }
                     string TCPmessage = "H" + StrInName.str;
-                    SDLNet_TCP_Send(TCPClient, TCPmessage.c_str(),
-                                    strlen(TCPmessage.c_str()) + 1);
+                    SDLNet_TCP_Send(TCPClient, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
                     SDLNet_TCP_Recv(TCPClient, TCPBufferClt, 16);
-                    name2 = TTF_RenderText_Solid(fontSmall, TCPBufferClt,
-                                                 textColor);
+                    name2 = TTF_RenderText_Solid(fontSmall, TCPBufferClt, textColor);
 
                     if (playercount > 2) {
-                        SDLNet_TCP_Send(TCPClient2, TCPmessage.c_str(),
-                                        strlen(TCPmessage.c_str()) + 1);
+                        SDLNet_TCP_Send(TCPClient2, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
                         if (playercount > 3) {
-                            SDLNet_TCP_Send(TCPClient3, TCPmessage.c_str(),
-                                            strlen(TCPmessage.c_str()) + 1);
+                            SDLNet_TCP_Send(TCPClient3, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
                         }
                     }
 
@@ -983,8 +906,7 @@ void run() {
             } else {
                 if ((TCPClient = SDLNet_TCP_Open(&address)) != NULL) {
                     SDLNet_TCP_Recv(TCPClient, TCPBufferClt, 100);
-                    SDLNet_TCP_Send(TCPClient, StrInName.str.c_str(),
-                                    strlen(StrInName.str.c_str()) + 1);
+                    SDLNet_TCP_Send(TCPClient, StrInName.str.c_str(), strlen(StrInName.str.c_str()) + 1);
                     if (TCPBufferClt[0] == 'H') {
                         TCPConnectionDone = true;
                         inTitle = false;
@@ -992,8 +914,7 @@ void run() {
                         for (int i = 0; i < 16; i++) {
                             name2array[i] = TCPBufferClt[i + 1];
                         }
-                        name2 = TTF_RenderText_Solid(fontSmall, name2array,
-                                                     textColor);
+                        name2 = TTF_RenderText_Solid(fontSmall, name2array, textColor);
                     }
                 } else {
                     fprintf(stderr, "SDLNet_TCP_Open: %s\n", SDLNet_GetError());
@@ -1054,14 +975,8 @@ void run() {
                             clickspamprevent0r2.start();
                         }
 
-                        if (abs(player2.x + player2.w / 2 -
-                                (ball.x + ball.w / 2)) <= 120 &&
-                            abs(player2.y + player2.h / 2 -
-                                (ball.y + ball.h / 2)) <= 120 &&
-                            (clickspamprevent0r2.get_ticks() == 0 ||
-                             clickspamprevent0r2.get_ticks() >
-                                 500)) // half a second cd
-                        {
+                        if (abs(player2.x + player2.w / 2 - (ball.x + ball.w / 2)) <= 120 && abs(player2.y + player2.h / 2 - (ball.y + ball.h / 2)) <= 120 &&
+                            (clickspamprevent0r2.get_ticks() == 0 || clickspamprevent0r2.get_ticks() > 500)) { // half a second cd
                             ball.getHit(player2);
                         }
                     }
@@ -1088,15 +1003,10 @@ void run() {
                     running = false;
                     break;
                 case SDLK_c:
-                    screen = SDL_SetVideoMode(
-                        SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale,
-                        SCREEN_BPP,
-                        SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
+                    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
                     break;
                 case SDLK_v:
-                    screen = SDL_SetVideoMode(
-                        SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale,
-                        SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
+                    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
                     break;
                 }
             }
@@ -1171,20 +1081,13 @@ void run() {
                     }
 
                     // hit the ball if in range and not on cd
-                    if (abs(player.x + player.w / 2 - (ball.x + ball.w / 2)) <=
-                            120 &&
-                        abs(player.y + player.h / 2 - (ball.y + ball.h / 2)) <=
-                            120 &&
-                        (clickspamprevent0r.get_ticks() == 0 ||
-                         clickspamprevent0r.get_ticks() >
-                             500)) // half a second cd
-                    {
+                    if (abs(player.x + player.w / 2 - (ball.x + ball.w / 2)) <= 120 && abs(player.y + player.h / 2 - (ball.y + ball.h / 2)) <= 120 &&
+                        (clickspamprevent0r.get_ticks() == 0 || clickspamprevent0r.get_ticks() > 500)) { // half a second cd
                         if (isHost) {
                             ball.getHit(player);
                         } else {
                             if (playernumber == 2) {
-                                hitball =
-                                    '2'; //(char) playernumber doesnt work T_T
+                                hitball = '2'; //(char) playernumber doesnt work T_T
                             }
                             if (playernumber == 3) {
                                 hitball = '3';

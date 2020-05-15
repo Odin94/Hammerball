@@ -28,29 +28,25 @@ void StringInput::handle_input(SDL_Event event) {
         // If the string less than maximum size
         if (str.length() <= 16) {
             // If the key is a space
-            if (event.key.keysym.unicode == (Uint16)' ' ||
-                event.key.keysym.unicode == (Uint16)'.') {
+            if (event.key.keysym.unicode == (Uint16)' ' || event.key.keysym.unicode == (Uint16)'.') {
                 // Append the character
                 str += (char)event.key.keysym.unicode;
             }
 
             // If the key is a number
-            else if ((event.key.keysym.unicode >= (Uint16)'0') &&
-                     (event.key.keysym.unicode <= (Uint16)'9')) {
+            else if ((event.key.keysym.unicode >= (Uint16)'0') && (event.key.keysym.unicode <= (Uint16)'9')) {
                 // Append the character
                 str += (char)event.key.keysym.unicode;
             }
 
             // If the key is a uppercase letter
-            else if ((event.key.keysym.unicode >= (Uint16)'A') &&
-                     (event.key.keysym.unicode <= (Uint16)'Z')) {
+            else if ((event.key.keysym.unicode >= (Uint16)'A') && (event.key.keysym.unicode <= (Uint16)'Z')) {
                 // Append the character
                 str += (char)event.key.keysym.unicode;
             }
 
             // If the key is a lowercase letter
-            else if ((event.key.keysym.unicode >= (Uint16)'a') &&
-                     (event.key.keysym.unicode <= (Uint16)'z')) {
+            else if ((event.key.keysym.unicode >= (Uint16)'a') && (event.key.keysym.unicode <= (Uint16)'z')) {
                 // Append the character
                 str += (char)event.key.keysym.unicode;
                 // std::cout << "String should be: " << str;

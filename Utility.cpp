@@ -54,8 +54,7 @@ void apply_surface(float drawscale, int x, int y, SDL_Surface *source,
         // Blit
         SDL_BlitSurface(source, clip, destination, &offset);
     } else {
-        SDL_Rect clipScaled = {clip->x * drawscale, clip->y * drawscale,
-                               clip->w * drawscale, clip->h * drawscale};
+        SDL_Rect clipScaled = {clip->x * drawscale, clip->y * drawscale, clip->w * drawscale, clip->h * drawscale};
         SDL_BlitSurface(source, &clipScaled, destination, &offset);
     }
 }
@@ -68,8 +67,8 @@ void apply_surface(float drawscale, int x, int y, SDL_Surface *source,
 
 std::string toStr(int number) {
     std::stringstream convert; // stream used for the conversion
-    convert << number; // insert the textual representation of 'Number' in the
-                       // characters in the stream
+    convert << number;         // insert the textual representation of 'Number' in the
+                               // characters in the stream
 
     return convert.str();
 }
@@ -91,8 +90,7 @@ std::string toDottedIP(Uint32 rawIP) {
     ;
 }
 
-bool checkCollision(int x, int y, int w, int h, int x2, int y2, int w2,
-                    int h2) {
+bool checkCollision(int x, int y, int w, int h, int x2, int y2, int w2, int h2) {
     // The sides of the rectangles
     int leftA, leftB;
     int rightA, rightB;
