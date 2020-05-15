@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-SDL_Surface *load_image(std::string filename) {
+SDL_Surface *load_image(SDL_Window *window, std::string filename) {
   // The image that's loaded
   SDL_Surface *loadedImage = NULL;
 
@@ -19,7 +19,8 @@ SDL_Surface *load_image(std::string filename) {
   // If the image loaded
   if (loadedImage != NULL) {
     // Create an optimized surface
-    optimizedImage = SDL_DisplayFormat(loadedImage);
+    optimizedImage = SDL_ConvertSurfaceFormat(
+        loadedImage, SDL_GetWindowPixelFormat(window), 0);
 
     // Free the old surface
     SDL_FreeSurface(loadedImage);
