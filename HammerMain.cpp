@@ -160,16 +160,12 @@ void init() {
     fstream settings;
     settings.open("Settings.txt", ios::in);
     if (settings.is_open()) {
-        settings.ignore(256,
-                        '\n'); // skips till \n character aka next line  (first
-                               // argument = max characters skipped)
+        settings.ignore(256, '\n'); // skips till \n character aka next line  (first argument = max characters skipped)
         getline(settings, desiredScreenWidthString);
         cout << desiredScreenWidthString;
         desiredScreenWidth = atoi(desiredScreenWidthString.c_str());
 
-        settings.ignore(256,
-                        '\n'); // skips till \n character aka next line  (first
-                               // argument = max characters skipped)
+        settings.ignore(256, '\n'); // skips till \n character aka next line  (first argument = max characters skipped)
         getline(settings, connectionIP);
 
         string tempplayercount;
@@ -181,8 +177,7 @@ void init() {
         getline(settings, tempplayernumber);
         playernumber = atoi(tempplayernumber.c_str());
     } else {
-        cout
-            << "Settings.txt didnt exist and was created, please start again\n";
+        cout << "Settings.txt didnt exist and was created, please start again\n";
         settings.open("Settings.txt", ios::out);
         settings << "ScreenWidth(Scale always 16:10):"
                  << "\n"
@@ -200,9 +195,7 @@ void init() {
         exit(0);
     }
 
-    drawscale = (float)desiredScreenWidth / SCREEN_WIDTH; // modify to accustom
-                                                          // to different window
-                                                          // sizes/resolutions
+    drawscale = (float)desiredScreenWidth / SCREEN_WIDTH; // modify to accustom to different window sizes/resolutions
     cout << drawscale;
 
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -248,8 +241,7 @@ void init() {
     clientSocket = SDLNet_UDP_Open(0);
 
     SDLNet_ResolveHost(&TCPip, NULL, 8134);
-    SDLNet_ResolveHost(&address, connectionIP.c_str(),
-                       8134); // address, hostIPString, (server's)port
+    SDLNet_ResolveHost(&address, connectionIP.c_str(), 8134); // address, hostIPString, (server's)port
     // TCPServer
     // Resolving the host using NULL make network interface to listen
     TCPServer = SDLNet_TCP_Open(&TCPip);
