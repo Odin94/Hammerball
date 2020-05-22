@@ -19,8 +19,7 @@ SDL_Surface *load_image(SDL_Window *window, std::string filename) {
     // If the image loaded
     if (loadedImage != NULL) {
         // Create an optimized surface
-        optimizedImage = SDL_ConvertSurfaceFormat(
-            loadedImage, SDL_GetWindowPixelFormat(window), 0);
+        optimizedImage = SDL_ConvertSurfaceFormat(loadedImage, SDL_GetWindowPixelFormat(window), 0);
 
         // Free the old surface
         SDL_FreeSurface(loadedImage);
@@ -39,9 +38,7 @@ SDL_Surface *load_image(SDL_Window *window, std::string filename) {
     return optimizedImage;
 }
 
-void apply_surface(float drawscale, int x, int y, SDL_Surface *source,
-                   SDL_Surface *destination,
-                   SDL_Rect *clip) // clip is defaulted to NULL!!
+void apply_surface(float drawscale, int x, int y, SDL_Surface *source, SDL_Surface *destination, SDL_Rect *clip) // clip is defaulted to NULL!!
 {
     // Holds offsets
     SDL_Rect offset;
@@ -59,8 +56,7 @@ void apply_surface(float drawscale, int x, int y, SDL_Surface *source,
     }
 }
 
-void apply_surface(float drawscale, int x, int y, SDL_Surface *source,
-                   SDL_Surface *destination, int xr, int yr, int w, int h) {
+void apply_surface(float drawscale, int x, int y, SDL_Surface *source, SDL_Surface *destination, int xr, int yr, int w, int h) {
     SDL_Rect rekt = {xr, yr, w, h};
     apply_surface(drawscale, x, y, source, destination, &rekt);
 }
