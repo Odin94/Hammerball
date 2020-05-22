@@ -1,5 +1,5 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = Utility.cpp Actors.cpp Timer.cpp Tile.cpp StringInput.cpp Rotozoom.c HammerMain.cpp
+OBJS = Utility.cpp Actors.cpp Timer.cpp Tile.cpp StringInput.cpp HammerMain.cpp
 
 #CC specifies which compiler we're using
 CC = g++
