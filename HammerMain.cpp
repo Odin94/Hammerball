@@ -812,7 +812,8 @@ void run() {
             }
 
             if (event.type == SDL_WINDOWEVENT_RESIZED) {
-                window = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_HWSURFACE | SDL_RESIZABLE);
+                // SDL_CreateWindow("Hammerball", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,event.resize.w, event.resize.h, SDL_WINDOW_OPENGL);
+                // window = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_HWSURFACE | SDL_RESIZABLE);
             }
 
             if (event.type == SDL_KEYDOWN || event.type == SDL_TEXTINPUT) {
@@ -868,10 +869,10 @@ void run() {
                     }
                     break;
                 case SDLK_c:
-                    window = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
+                    SDL_SetWindowFullscreen(window, SDL_FALSE);
                     break;
                 case SDLK_v:
-                    window = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
+                    SDL_SetWindowFullscreen(window, SDL_TRUE);
                     break;
 
                 case SDLK_h:
