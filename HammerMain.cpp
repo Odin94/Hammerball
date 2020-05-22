@@ -24,6 +24,7 @@ void initStage();
 const int SCREEN_WIDTH = 1600; // 25 tiles
 const int SCREEN_HEIGHT = 960; // 15 tiles
 const int SCREEN_BPP = 32;
+const int DTS = 64; // default tile size
 
 const int GROUND_TILE = 0;
 const int SPIKES_TILE = 1;
@@ -92,7 +93,7 @@ TTF_Font *fontSmall = NULL;
 SDL_Color textColor = {30, 30, 30};
 SDL_Color bgcolor = {0, 0, 0};
 
-SDL_Texture *surfaces[10];
+SDL_Texture *textures[10];
 
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
@@ -203,9 +204,6 @@ bool init() {
         success = false;
     }
 
-    //Enable text input
-    SDL_StartTextInput();
-
     // init networkstuff
     SDLNet_Init();
 
@@ -252,7 +250,6 @@ bool init() {
     font = TTF_OpenFont("res/Demonized.ttf", 28);
     fontSmall = TTF_OpenFont("res/Demonized.ttf", 12);
 
-    // SDL1: screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE);
     window = SDL_CreateWindow("Hammerball", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SDL_WINDOW_OPENGL /*SDL_WINDOW_FULLSCREEN */);
     if (window == NULL) {
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -298,25 +295,25 @@ bool init() {
     TEST = load_texture("res/asphaltdecal.png", renderer);
     TEST2 = load_texture("res/asphaltdecal2.png", renderer);
 
-    string xxy = "";
+    string xxy = " ";
     text = load_from_rendered_text(font, xxy, textColor, renderer);
     name = load_from_rendered_text(font, xxy, textColor, renderer);
     name2 = load_from_rendered_text(fontSmall, xxy, textColor, renderer);
 
-    surfaces[0] = ATile_ground;
-    surfaces[1] = BTile_Spikes;
-    surfaces[2] = BTile_Wall;
-    surfaces[3] = FallingTile;
+    textures[0] = ATile_ground;
+    textures[1] = BTile_Spikes;
+    textures[2] = BTile_Wall;
+    textures[3] = FallingTile;
     // score = TTF_RenderUTF8_Shaded(font, toString(travelled).c_str(), textColor, bgcolor);
 
-    player.set(100, 270, 64, 64, 0, 0);
-    player2.set(1430, 270, 64, 64, 0, 0);
-    player3.set(100, 600, 64, 64, 0, 0);
-    player4.set(1430, 600, 64, 64, 0, 0);
+    player.set(100, 270, DTS, DTS, 0, 0);
+    player2.set(1430, 270, DTS, DTS, 0, 0);
+    player3.set(100, 600, DTS, DTS, 0, 0);
+    player4.set(1430, 600, DTS, DTS, 0, 0);
 
-    ai.set(1430, 270, 64, 64, 0, 0);
+    ai.set(1430, 270, DTS, DTS, 0, 0);
 
-    ball.set(730, 500, 64, 64, 0, 0);
+    ball.set(730, 500, DTS, DTS, 0, 0);
 
     healthrect.x = 0;
     healthrect.y = 0;
@@ -340,7 +337,7 @@ void initStage() {
     for (int i = 0; i < 25; i++) {
         for (int j = 0; j < 15; j++) {
             rnd = (rand() % 3);
-            ATiles[i][j].clip_rect.x = rnd * 64 + 1;
+            ATiles[i][j].clip_rect.x = rnd * DTS + 1;
             if (ATiles[i][j].clip_rect.x == 1) {
                 ATiles[i][j].clip_rect.x = 0;
             }
@@ -349,7 +346,7 @@ void initStage() {
 
             int *mpc = charAToIntA(separateString(mapContent, 10, ","), 10);
 
-            ATiles[i][j].setE(i * 64, j * 64, 64, 64, mpc[0], mpc[1], mpc[2], mpc[3], mpc[4], mpc[5] != 0, mpc[6] != 0, mpc[7], mpc[8], mpc[9]);
+            ATiles[i][j].setE(i * DTS, j * DTS, DTS, DTS, mpc[0], mpc[1], mpc[2], mpc[3], mpc[4], mpc[5] != 0, mpc[6] != 0, mpc[7], mpc[8], mpc[9]);
 
             if (ATiles[i][j].img == FALLING_TILE) {
                 ATiles[i][j].generateTime();
@@ -358,117 +355,126 @@ void initStage() {
 
             mapContent.clear();
 
-            BTiles[i][j].setE(i * 64, j * 64, 64, 64, -1, 0, -1, 0, 1, true, true, 0, 0, 0);
+            BTiles[i][j].setE(i * DTS, j * DTS, DTS, DTS, -1, 0, -1, 0, 1, true, true, 0, 0, 0);
             BTiles[i][j].clip_rect.x = 0;
             BTiles[i][j].clip_rect.y = 0;
         }
     }
     map.close();
 
-    ATiles[11][12].setE(11 * 64, 12 * 64, 64, 64, 8, 1, FALLING_TILE, 9, 100, true, true, 2000, 3000, 2500);
+    ATiles[11][12].setE(11 * DTS, 12 * DTS, DTS, DTS, 8, 1, FALLING_TILE, 9, 100, true, true, 2000, 3000, 2500);
     ATiles[11][12].generateTime();
     ATiles[11][12].clip_rect.x = 0;
 
-    ATiles[11][11].setE(11 * 64, 11 * 64, 64, 64, 8, 1, FALLING_TILE, 9, 250, true, true, 2000, 3000, 2500);
+    ATiles[11][11].setE(11 * DTS, 11 * DTS, DTS, DTS, 8, 1, FALLING_TILE, 9, 250, true, true, 2000, 3000, 2500);
     ATiles[11][11].generateTime();
     ATiles[11][11].clip_rect.x = 0;
 }
 
 void draw() {
+    //Clear screen
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(renderer);
+
     if (multiplayer && inTitle) {
         if (isHost) {
-            apply_surface(drawscale, 0, 0, HostingScreen, renderer);
+            apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, HostingScreen, renderer);
         } else {
-            apply_surface(drawscale, 0, 0, ClientScreen, renderer);
+            apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ClientScreen, renderer);
         }
     } else if (inTitle) {
         if (!inputdone) {
-            apply_surface(drawscale, 0, 0, SettingsBG, renderer);
-            apply_surface(drawscale, 600, 200, text, renderer);
-            apply_surface(drawscale, 600, 680, name, renderer);
+            apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SettingsBG, renderer);
+
+            int textW, textH;
+            SDL_QueryTexture(text, NULL, NULL, &textW, &textH);
+            int nameW, nameH;
+            SDL_QueryTexture(name, NULL, NULL, &nameW, &nameH);
+            apply_surface(drawscale, 600, 200, textW, textH, text, renderer);
+            apply_surface(drawscale, 600, 680, nameW, nameH, name, renderer);
         } else {
-            apply_surface(drawscale, 0, 0, TitleScreen, renderer);
+            apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, TitleScreen, renderer);
         }
     } else {
         for (int i = 0; i < 25; i++) {
             for (int j = 0; j < 15; j++) {
                 if (ATiles[i][j].active) {
-                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, surfaces[ATiles[i][j].img], renderer, &ATiles[i][j].clip_rect);
+                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, textures[ATiles[i][j].img], renderer, &ATiles[i][j].clip_rect);
                 }
                 if (ATiles[i][j].needsBorder) { // check if borders from top, left, right or bottom need to be drawn
                     if (!ATiles[i - 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, renderer, 0, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 0, 0, DTS, DTS);
                     }
                     if (!ATiles[i + 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, renderer, 67, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 67, 0, DTS, DTS);
                     }
                     if (!ATiles[i][j - 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, renderer, 134, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 134, 0, DTS, DTS);
                     }
                     if (!ATiles[i][j + 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, renderer, 201, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 201, 0, DTS, DTS);
                     }
                 }
                 if (BTiles[i][j].active) {
-                    apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y, surfaces[BTiles[i][j].img], renderer, &BTiles[i][j].clip_rect);
+                    apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y, DTS, DTS, textures[BTiles[i][j].img], renderer, &BTiles[i][j].clip_rect);
                 }
             }
         }
 
         if (upgrade.active) {
             if (upgrade.type == 's') {
-                apply_surface(drawscale, upgrade.x, upgrade.y, SpeedUp, renderer);
+                apply_surface(drawscale, upgrade.x, upgrade.y, DTS, DTS, SpeedUp, renderer);
             }
             if (upgrade.type == 'p') {
-                apply_surface(drawscale, upgrade.x, upgrade.y, PowerUp, renderer);
+                apply_surface(drawscale, upgrade.x, upgrade.y, DTS, DTS, PowerUp, renderer);
             }
         }
 
         if (!multiplayer && !localmultiplayer) {
             if (ai.alive) {
-                apply_surface(drawscale, ai.x, ai.y, PlayerSprite, renderer, &ai.clip_rect);
+                apply_surface(drawscale, ai.x, ai.y, DTS, DTS, PlayerSprite, renderer, &ai.clip_rect);
             } else {
-                apply_surface(drawscale, ai.x, ai.y, PlayerDead, renderer);
+                apply_surface(drawscale, ai.x, ai.y, DTS, DTS, PlayerDead, renderer);
             }
         }
 
         if (player.alive) {
-            apply_surface(drawscale, player.x, player.y, PlayerSprite, renderer, &player.clip_rect);
+            apply_surface(drawscale, player.x, player.y, DTS, DTS, PlayerSprite, renderer, &player.clip_rect);
         } else {
-            apply_surface(drawscale, player.x, player.y, PlayerDead, renderer);
+            apply_surface(drawscale, player.x, player.y, DTS, DTS, PlayerDead, renderer);
         }
         if (multiplayer || localmultiplayer) {
             if (player2.alive) {
-                apply_surface(drawscale, player2.x, player2.y, PlayerSprite, renderer, &player2.clip_rect);
+                apply_surface(drawscale, player2.x, player2.y, DTS, DTS, PlayerSprite, renderer, &player2.clip_rect);
             } else {
-                apply_surface(drawscale, player2.x, player2.y, PlayerDead, renderer);
+                apply_surface(drawscale, player2.x, player2.y, DTS, DTS, PlayerDead, renderer);
             }
             if (playercount > 2 && player3.alive) {
-                apply_surface(drawscale, player3.x, player3.y, PlayerSprite, renderer, &player3.clip_rect);
+                apply_surface(drawscale, player3.x, player3.y, DTS, DTS, PlayerSprite, renderer, &player3.clip_rect);
                 if (playercount > 3 && player4.alive) {
-                    apply_surface(drawscale, player4.x, player4.y, PlayerSprite, renderer, &player4.clip_rect);
+                    apply_surface(drawscale, player4.x, player4.y, DTS, DTS, PlayerSprite, renderer, &player4.clip_rect);
                 }
             }
         }
 
         if (ball.lethal) {
-            apply_surface(drawscale, ball.x, ball.y, BallLethal, renderer);
+            apply_surface(drawscale, ball.x, ball.y, DTS, DTS, BallLethal, renderer);
         } else {
-            apply_surface(drawscale, ball.x, ball.y, BallNonLethal, renderer);
+            apply_surface(drawscale, ball.x, ball.y, DTS, DTS, BallNonLethal, renderer);
         }
 
         // draw UI
-        apply_surface(drawscale, player.x, player.y - 25, name, renderer);
-        apply_surface(drawscale, player2.x, player2.y - 25, name2, renderer);
-        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBarFrame, renderer);
+        int nameW, nameH;
+        SDL_QueryTexture(name, NULL, NULL, &nameW, &nameH);
+        int name2W, name2H;
+        SDL_QueryTexture(name2, NULL, NULL, &name2W, &name2H);
+        apply_surface(drawscale, player.x, player.y - 25, nameW, nameH, name, renderer);
+        apply_surface(drawscale, player2.x, player2.y - 25, name2W, name2H, name2, renderer);
+        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, 109, 32, HealthBarFrame, renderer);
 
         healthrect.w = 105 - (100 - player.health);
-        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBar, renderer, &healthrect);
+        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, 109, 32, HealthBar, renderer, &healthrect);
     }
-
-    //Clear screen
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderClear(renderer);
 
     //Update screen
     SDL_RenderPresent(renderer);
@@ -652,7 +658,8 @@ void update(Uint32 delta) {
             player.inBallRange = false;
         }
 
-        if (BTiles[(player.x + player.w / 2) / 64][(player.y + player.h / 2) / 64].damage > 0 || ATiles[(player.x + player.w / 2) / 64][(player.y + player.h / 2) / 64].damage > 0) {
+        if (BTiles[(player.x + player.w / 2) / DTS][(player.y + player.h / 2) / DTS].damage > 0 ||
+            ATiles[(player.x + player.w / 2) / DTS][(player.y + player.h / 2) / DTS].damage > 0) {
             player.alive = false;
         }
     }
@@ -688,7 +695,7 @@ void update(Uint32 delta) {
             uy = rand() % 15;
         }
 
-        upgrade.set(ux * 64, uy * 64, 64, 64, 0, 0);
+        upgrade.set(ux * DTS, uy * DTS, DTS, DTS, 0, 0);
         int typerand = rand() % 2;
 
         if (typerand == 0) {
@@ -804,6 +811,8 @@ void update(Uint32 delta) {
 }
 
 void run() {
+    SDL_StartTextInput();
+
     while (inTitle == true) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
@@ -833,6 +842,7 @@ void run() {
                     }
 
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
+                        SDL_StopTextInput();
                         running = false;
                         inTitle = false;
                     }
@@ -849,6 +859,7 @@ void run() {
                             }
                             name = load_from_rendered_text(fontSmall, StrInName.str, textColor, renderer);
                             inputdone = true;
+                            SDL_StopTextInput();
                         }
                     }
                     break;
@@ -1000,17 +1011,17 @@ void run() {
                 // reset game state for SP
                 case SDLK_r:
                     if (localmultiplayer) {
-                        player.set(100, 270, 64, 64, 0, 0);
+                        player.set(100, 270, DTS, DTS, 0, 0);
                         player.alive = true;
-                        player2.set(1430, 270, 64, 64, 0, 0);
+                        player2.set(1430, 270, DTS, DTS, 0, 0);
                         player2.alive = true;
-                        ball.set(730, 500, 64, 64, 0, 0);
+                        ball.set(730, 500, DTS, DTS, 0, 0);
                     } else if (!multiplayer) {
-                        player.set(100, 270, 64, 64, 0, 0);
+                        player.set(100, 270, DTS, DTS, 0, 0);
                         player.alive = true;
-                        ai.set(1430, 270, 64, 64, 0, 0);
+                        ai.set(1430, 270, DTS, DTS, 0, 0);
                         ai.alive = true;
-                        ball.set(730, 500, 64, 64, 0, 0);
+                        ball.set(730, 500, DTS, DTS, 0, 0);
                     }
                     break;
 
@@ -1137,4 +1148,6 @@ int main(int argc, char *args[]) {
 
     running = true;
     run();
+
+    return 0;
 }

@@ -59,31 +59,26 @@ SDL_Texture *load_from_rendered_text(TTF_Font *font, std::string text, SDL_Color
     return texture;
 }
 
-void apply_surface(float drawscale, int x, int y, SDL_Texture *texture, SDL_Renderer *renderer, SDL_Rect *clip) // clip is defaulted to NULL!!
+void apply_surface(float drawscale, int x, int y, int w, int h, SDL_Texture *texture, SDL_Renderer *renderer, SDL_Rect *srcRect) // clip is defaulted to NULL!!
 {
-    // Holds offsets
-    SDL_Rect offset;
+    SDL_Rect destRect = {x * drawscale, y * drawscale, w * drawscale, h * drawscale};
 
-    // Get offsets
-    offset.x = x * drawscale;
-    offset.y = y * drawscale;
-
-    if (clip != NULL) {
-        clip->x *= drawscale;
-        clip->y *= drawscale;
-        clip->w *= drawscale;
-        clip->h *= drawscale;
+    if (srcRect != NULL) {
+        srcRect->x *= drawscale;
+        srcRect->y *= drawscale;
+        srcRect->w *= drawscale;
+        srcRect->h *= drawscale;
 
         // printf("Rendering: clip x %d, y %d, w %d, h %d \n", clip->x, clip->y, clip->w, clip->h);
     }
     // printf("Rendering: offset x %d, y %d, w %d, h %d \n\n", offset.x, offset.y, offset.w, offset.h);
 
-    SDL_RenderCopy(renderer, texture, clip, &offset);
+    SDL_RenderCopy(renderer, texture, srcRect, &destRect);
 }
 
-void apply_surface(float drawscale, int x, int y, SDL_Texture *texture, SDL_Renderer *renderer, int xr, int yr, int w, int h) {
-    SDL_Rect rekt = {xr, yr, w, h};
-    apply_surface(drawscale, x, y, texture, renderer, &rekt);
+void apply_surface(float drawscale, int x, int y, int w, int h, SDL_Texture *texture, SDL_Renderer *renderer, int xr, int yr, int wr, int hr) {
+    SDL_Rect rekt = {xr, yr, wr, hr};
+    apply_surface(drawscale, x, y, w, h, texture, renderer, &rekt);
 }
 
 std::string toStr(int number) {
