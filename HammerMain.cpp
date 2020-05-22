@@ -9,6 +9,7 @@
 #include <sstream>
 #include <fstream>
 #include <ctime>
+#include <cstring>
 #include <iostream>
 #include "./Utility.h"
 #include "./Actors.h"
