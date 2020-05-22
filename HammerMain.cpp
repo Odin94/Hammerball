@@ -123,8 +123,8 @@ SDL_Texture *BallNonLethal = NULL;
 
 SDL_Rect healthrect;
 
-StringInput StrIn();
-StringInput StrInName();
+StringInput StrIn;
+StringInput StrInName;
 int inputcounter = 0;
 bool inputdone = false;
 SDL_Texture *text = NULL;
