@@ -5,14 +5,9 @@
 #include <iostream>
 #include "Utility.h"
 
-StringInput::StringInput(SDL_Surface *screen, int w, int h) {
+StringInput::StringInput(int w, int h) {
     // Initialize the string
     str = "";
-
-    mainscreen = screen;
-
-    SCREEN_WIDTH = w;
-    SCREEN_HEIGHT = h;
 }
 
 StringInput::~StringInput() {}

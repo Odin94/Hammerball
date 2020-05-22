@@ -7,11 +7,6 @@
 
 class StringInput {
   private:
-    SDL_Surface *mainscreen;
-
-    int SCREEN_WIDTH;
-    int SCREEN_HEIGHT;
-
     TTF_Font *font;
 
   public:
