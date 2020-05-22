@@ -36,6 +36,8 @@ SDL_Texture *load_texture(std::string path, SDL_Renderer *renderer) {
 SDL_Texture *load_from_rendered_text(TTF_Font *font, std::string text, SDL_Color text_color, SDL_Renderer *renderer) {
     SDL_Texture *texture = NULL;
 
+    if (text.empty()) text = " ";
+
     //Render text surface
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, text.c_str(), text_color);
     if (textSurface == NULL) {
@@ -64,12 +66,17 @@ void apply_surface(float drawscale, int x, int y, SDL_Texture *texture, SDL_Rend
     offset.x = x * drawscale;
     offset.y = y * drawscale;
 
-    if (clip == NULL) {
-        SDL_RenderCopy(renderer, texture, clip, &offset);
-    } else {
-        SDL_Rect clipScaled = {clip->x * drawscale, clip->y * drawscale, clip->w * drawscale, clip->h * drawscale};
-        SDL_RenderCopy(renderer, texture, &clipScaled, &offset);
+    if (clip != NULL) {
+        clip->x *= drawscale;
+        clip->y *= drawscale;
+        clip->w *= drawscale;
+        clip->h *= drawscale;
+
+        // printf("Rendering: clip x %d, y %d, w %d, h %d \n", clip->x, clip->y, clip->w, clip->h);
     }
+    // printf("Rendering: offset x %d, y %d, w %d, h %d \n\n", offset.x, offset.y, offset.w, offset.h);
+
+    SDL_RenderCopy(renderer, texture, clip, &offset);
 }
 
 void apply_surface(float drawscale, int x, int y, SDL_Texture *texture, SDL_Renderer *renderer, int xr, int yr, int w, int h) {
