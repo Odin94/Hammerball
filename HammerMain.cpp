@@ -9,7 +9,6 @@
 #include <Tile.h>
 #include <StringInput.h>
 #include <SDL_ttf.h>
-#include <rotozoom.h>
 #include <Math.h>
 #include <string>
 #include <sstream>
@@ -91,18 +90,10 @@ TTF_Font *fontSmall = NULL;
 SDL_Color textColor = {30, 30, 30};
 SDL_Color bgcolor = {0, 0, 0};
 
-Bullet newbullet;
-Enemy newenemy;
-
-Bullet bullets[32];
-int bulletcounter;
-
-Enemy enemies[32];
-int enemycounter;
-
 SDL_Surface *surfaces[10];
 
-SDL_Surface *screen = NULL;
+SDL_Window *window = NULL;
+SDL_Renderer *renderer = NULL;
 SDL_Surface *TitleScreen = NULL;
 SDL_Surface *HostingScreen = NULL;
 SDL_Surface *SettingsBG = NULL;
@@ -131,8 +122,8 @@ SDL_Surface *BallNonLethal = NULL;
 
 SDL_Rect healthrect;
 
-StringInput StrIn(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
-StringInput StrInName(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
+StringInput StrIn(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+StringInput StrInName(window, SCREEN_WIDTH, SCREEN_HEIGHT);
 int inputcounter = 0;
 bool inputdone = false;
 SDL_Surface *text = NULL;
@@ -155,7 +146,9 @@ Ball ball;
 // The event structure
 SDL_Event event;
 
-void init() {
+bool init() {
+    bool success = true;
+
     // read options
     fstream settings;
     settings.open("Settings.txt", ios::in);
@@ -249,35 +242,51 @@ void init() {
     font = TTF_OpenFont("res/Demonized.ttf", 28);
     fontSmall = TTF_OpenFont("res/Demonized.ttf", 12);
 
-    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE);
+    // SDL1: screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE);
+    window = SDL_CreateWindow("Hammerball", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SDL_WINDOW_OPENGL /*SDL_WINDOW_FULLSCREEN */);
+    if (window == NULL) {
+        printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
+        success = false;
+    }
+    renderer = SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+    if (renderer == NULL) {
+        printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
+        success = false;
+    }
+
+    int imgFlags = IMG_INIT_PNG;
+    if (!(IMG_Init(imgFlags) & imgFlags)) {
+        printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+        success = false;
+    }
 
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096); // init mixer
 
-    ATile_ground = rotozoomSurface(load_image("res/ground.png"), 0, drawscale, 0);
-    BTile_Wall = rotozoomSurface(load_image("res/Wall.png"), 0, drawscale, 0);
-    FallingTile = rotozoomSurface(load_image("res/falltile.png"), 0, drawscale, 0);
+    ATile_ground = load_texture("res/ground.png");
+    BTile_Wall = load_texture("res/Wall.png");
+    FallingTile = load_texture("res/falltile.png");
 
-    PlayerSprite = rotozoomSurface(load_image("res/Ironman.png"), 0, drawscale, 0);
-    PlayerDead = rotozoomSurface(load_image("res/PlayerDead.png"), 0, drawscale, 0);
+    PlayerSprite = load_texture("res/Ironman.png");
+    PlayerDead = load_texture("res/PlayerDead.png");
 
-    TitleScreen = rotozoomSurface(load_image("res/Title.png"), 0, drawscale, 0);
-    HostingScreen = rotozoomSurface(load_image("res/Hosting.png"), 0, drawscale, 0);
-    ClientScreen = rotozoomSurface(load_image("res/Client.png"), 0, drawscale, 0);
-    SettingsBG = rotozoomSurface(load_image("res/Settings.png"), 0, drawscale, 0);
+    TitleScreen = load_texture("res/Title.png");
+    HostingScreen = load_texture("res/Hosting.png");
+    ClientScreen = load_texture("res/Client.png");
+    SettingsBG = load_texture("res/Settings.png");
 
-    SpeedUp = rotozoomSurface(load_image("res/SpeedUp.png"), 0, drawscale, 0);
-    PowerUp = rotozoomSurface(load_image("res/PowerUp.png"), 0, drawscale, 0);
+    SpeedUp = load_texture("res/SpeedUp.png");
+    PowerUp = load_texture("res/PowerUp.png");
 
-    HealthBar = rotozoomSurface(load_image("res/healthbar.png"), 0, drawscale, 0);
-    HealthBarFrame = rotozoomSurface(load_image("res/HealthBarFrame.png"), 0, drawscale, 0);
+    HealthBar = load_texture("res/healthbar.png");
+    HealthBarFrame = load_texture("res/HealthBarFrame.png");
 
-    BallLethal = rotozoomSurface(load_image("res/Ball.png"), 0, drawscale, 0);
-    BallNonLethal = rotozoomSurface(load_image("res/Ballnonlethal.png"), 0, drawscale, 0);
+    BallLethal = load_texture("res/Ball.png");
+    BallNonLethal = load_texture("res/Ballnonlethal.png");
 
-    Borders = rotozoomSurface(load_image("res/Borders.png"), 0, drawscale, 0);
+    Borders = load_texture("res/Borders.png");
 
-    TEST = rotozoomSurface(load_image("res/asphaltdecal.png"), 0, drawscale, 0);
-    TEST2 = rotozoomSurface(load_image("res/asphaltdecal2.png"), 0, drawscale, 0);
+    TEST = load_texture("res/asphaltdecal.png");
+    TEST2 = load_texture("res/asphaltdecal2.png");
 
     string xxy = "";
     text = TTF_RenderText_Solid(font, xxy.c_str(), textColor);
@@ -289,9 +298,6 @@ void init() {
     surfaces[2] = BTile_Wall;
     surfaces[3] = FallingTile;
     // score = TTF_RenderUTF8_Shaded(font, toString(travelled).c_str(), textColor, bgcolor);
-
-    bulletcounter = 0; // counts how many player-bullets are on the field
-    enemycounter = 0;  // counts enemies
 
     player.set(100, 270, 64, 64, 0, 0);
     player2.set(1430, 270, 64, 64, 0, 0);
@@ -310,6 +316,8 @@ void init() {
     // Stage1music = Mix_LoadMUS("res/MysteriousSpace.wav");
 
     initStage();
+
+    return success;
 }
 
 // setE: xywh, dmgfr, dmgfrdmg, img, maxframes, time2nextframe, traversable,
@@ -359,98 +367,98 @@ void initStage() {
 void draw() {
     if (multiplayer && inTitle) {
         if (isHost) {
-            apply_surface(drawscale, 0, 0, HostingScreen, screen);
+            apply_surface(drawscale, 0, 0, HostingScreen, window);
         } else {
-            apply_surface(drawscale, 0, 0, ClientScreen, screen);
+            apply_surface(drawscale, 0, 0, ClientScreen, window);
         }
     } else if (inTitle) {
         if (!inputdone) {
-            apply_surface(drawscale, 0, 0, SettingsBG, screen);
-            apply_surface(drawscale, 600, 200, text, screen);
-            apply_surface(drawscale, 600, 680, name, screen);
+            apply_surface(drawscale, 0, 0, SettingsBG, window);
+            apply_surface(drawscale, 600, 200, text, window);
+            apply_surface(drawscale, 600, 680, name, window);
         } else {
-            apply_surface(drawscale, 0, 0, TitleScreen, screen);
+            apply_surface(drawscale, 0, 0, TitleScreen, window);
         }
     } else {
         for (int i = 0; i < 25; i++) {
             for (int j = 0; j < 15; j++) {
                 if (ATiles[i][j].active) {
-                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, surfaces[ATiles[i][j].img], screen, &ATiles[i][j].clip_rect);
+                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, surfaces[ATiles[i][j].img], window, &ATiles[i][j].clip_rect);
                 }
                 if (ATiles[i][j].needsBorder) { // check if borders from top, left, right or bottom need to be drawn
                     if (!ATiles[i - 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, screen, 0, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, window, 0, 0, 64, 64);
                     }
                     if (!ATiles[i + 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, screen, 67, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, window, 67, 0, 64, 64);
                     }
                     if (!ATiles[i][j - 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, screen, 134, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, window, 134, 0, 64, 64);
                     }
                     if (!ATiles[i][j + 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, screen, 201, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, window, 201, 0, 64, 64);
                     }
                 }
                 if (BTiles[i][j].active) {
-                    apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y, surfaces[BTiles[i][j].img], screen, &BTiles[i][j].clip_rect);
+                    apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y, surfaces[BTiles[i][j].img], window, &BTiles[i][j].clip_rect);
                 }
             }
         }
 
         if (upgrade.active) {
             if (upgrade.type == 's') {
-                apply_surface(drawscale, upgrade.x, upgrade.y, SpeedUp, screen);
+                apply_surface(drawscale, upgrade.x, upgrade.y, SpeedUp, window);
             }
             if (upgrade.type == 'p') {
-                apply_surface(drawscale, upgrade.x, upgrade.y, PowerUp, screen);
+                apply_surface(drawscale, upgrade.x, upgrade.y, PowerUp, window);
             }
         }
 
         if (!multiplayer && !localmultiplayer) {
             if (ai.alive) {
-                apply_surface(drawscale, ai.x, ai.y, PlayerSprite, screen, &ai.clip_rect);
+                apply_surface(drawscale, ai.x, ai.y, PlayerSprite, window, &ai.clip_rect);
             } else {
-                apply_surface(drawscale, ai.x, ai.y, PlayerDead, screen);
+                apply_surface(drawscale, ai.x, ai.y, PlayerDead, window);
             }
         }
 
         if (player.alive) {
-            apply_surface(drawscale, player.x, player.y, PlayerSprite, screen, &player.clip_rect);
+            apply_surface(drawscale, player.x, player.y, PlayerSprite, window, &player.clip_rect);
         } else {
-            apply_surface(drawscale, player.x, player.y, PlayerDead, screen);
+            apply_surface(drawscale, player.x, player.y, PlayerDead, window);
         }
         if (multiplayer || localmultiplayer) {
             if (player2.alive) {
-                apply_surface(drawscale, player2.x, player2.y, PlayerSprite, screen, &player2.clip_rect);
+                apply_surface(drawscale, player2.x, player2.y, PlayerSprite, window, &player2.clip_rect);
             } else {
-                apply_surface(drawscale, player2.x, player2.y, PlayerDead, screen);
+                apply_surface(drawscale, player2.x, player2.y, PlayerDead, window);
             }
             if (playercount > 2 && player3.alive) {
-                apply_surface(drawscale, player3.x, player3.y, PlayerSprite, screen, &player3.clip_rect);
+                apply_surface(drawscale, player3.x, player3.y, PlayerSprite, window, &player3.clip_rect);
                 if (playercount > 3 && player4.alive) {
-                    apply_surface(drawscale, player4.x, player4.y, PlayerSprite, screen, &player4.clip_rect);
+                    apply_surface(drawscale, player4.x, player4.y, PlayerSprite, window, &player4.clip_rect);
                 }
             }
         }
 
         if (ball.lethal) {
-            apply_surface(drawscale, ball.x, ball.y, BallLethal, screen);
+            apply_surface(drawscale, ball.x, ball.y, BallLethal, window);
         } else {
-            apply_surface(drawscale, ball.x, ball.y, BallNonLethal, screen);
+            apply_surface(drawscale, ball.x, ball.y, BallNonLethal, window);
         }
 
         // draw UI
-        apply_surface(drawscale, player.x, player.y - 25, name, screen);
-        apply_surface(drawscale, player2.x, player2.y - 25, name2, screen);
-        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBarFrame, screen);
+        apply_surface(drawscale, player.x, player.y - 25, name, window);
+        apply_surface(drawscale, player2.x, player2.y - 25, name2, window);
+        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBarFrame, window);
 
         healthrect.w = 105 - (100 - player.health);
-        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBar, screen, &healthrect);
+        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBar, window, &healthrect);
 
         //    apply_surface(64*5, 64*5, TEST, screen);
         //   apply_surface(64*2,64*2, TEST2, screen);
     }
-    SDL_Flip(screen);
+    SDL_Flip(window);
 }
 
 void handleMP() // TCP introduction makes both sides crash when moving the
@@ -791,7 +799,7 @@ void run() {
             }
 
             if (event.type == SDL_VIDEORESIZE) {
-                screen = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_HWSURFACE | SDL_RESIZABLE);
+                window = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_HWSURFACE | SDL_RESIZABLE);
             }
 
             if (event.type == SDL_KEYDOWN) {
@@ -847,10 +855,10 @@ void run() {
                     }
                     break;
                 case SDLK_c:
-                    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
+                    window = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
                     break;
                 case SDLK_v:
-                    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
+                    window = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
                     break;
 
                 case SDLK_h:
@@ -995,10 +1003,10 @@ void run() {
                     running = false;
                     break;
                 case SDLK_c:
-                    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
+                    window = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
                     break;
                 case SDLK_v:
-                    screen = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
+                    window = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
                     break;
                 }
             }
