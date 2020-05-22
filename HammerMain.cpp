@@ -191,10 +191,18 @@ bool init() {
     drawscale = (float)desiredScreenWidth / SCREEN_WIDTH; // modify to accustom to different window sizes/resolutions
     cout << drawscale;
 
-    SDL_Init(SDL_INIT_EVERYTHING);
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+        printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
+        success = false;
+    }
 
-    TTF_Init();
-    SDL_EnableUNICODE(SDL_ENABLE);
+    if (TTF_Init() == -1) {
+        printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+        success = false;
+    }
+
+    //Enable text input
+    SDL_StartTextInput();
 
     // init networkstuff
     SDLNet_Init();
@@ -802,7 +810,7 @@ void run() {
                 window = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_HWSURFACE | SDL_RESIZABLE);
             }
 
-            if (event.type == SDL_KEYDOWN) {
+            if (event.type == SDL_KEYDOWN || event.type == SDL_TEXTINPUT) {
                 if (!inputdone) {
                     if (inputcounter == 0) {
                         StrIn.handle_input(event);
