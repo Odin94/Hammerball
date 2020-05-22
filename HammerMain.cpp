@@ -868,6 +868,7 @@ void run() {
                         inTitle = false;
                     }
                     break;
+
                 case SDLK_c:
                     SDL_SetWindowFullscreen(window, SDL_FALSE);
                     break;
@@ -1016,11 +1017,12 @@ void run() {
                 case SDLK_ESCAPE:
                     running = false;
                     break;
+
                 case SDLK_c:
-                    window = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE | SDL_FULLSCREEN);
+                    SDL_SetWindowFullscreen(window, SDL_FALSE);
                     break;
                 case SDLK_v:
-                    window = SDL_SetVideoMode(SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE);
+                    SDL_SetWindowFullscreen(window, SDL_TRUE);
                     break;
                 }
             }
