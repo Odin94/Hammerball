@@ -1,3 +1,8 @@
+# Hammerball
+This is an old game project I wrote during university for fun and practice. 
+
+I've recently discovered the code on my old hard drive and am now looking to clean it up a bit and make it run with SDL2 instead of SDL1.2.
+
 
 ## Dependencies
 Unpack the 32bit version of the following dependencies into `C:\mingw_dev_lib`
