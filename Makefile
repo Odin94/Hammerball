@@ -16,7 +16,7 @@ LIBRARY_PATHS = -LC:\mingw_dev_lib\lib
 COMPILER_FLAGS = -w -Wl,-subsystem,windows
 
 #LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lmingw32 -lSDLmain -lSDL.dll -lSDL_image -lSDL_mixer -lSDL_ttf -lSDL_net
+LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lSDL2_net
 
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = Hammerball
