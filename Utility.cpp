@@ -5,8 +5,10 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <cstring>
 
-SDL_Texture *load_texture(std::string path) {
+
+SDL_Texture *load_texture(std::string path, SDL_Renderer* renderer) {
     //The final texture
     SDL_Texture *newTexture = NULL;
 
@@ -19,7 +21,7 @@ SDL_Texture *load_texture(std::string path) {
         SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
 
         //Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
+        newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
         if (newTexture == NULL) {
             printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
         }
