@@ -5,7 +5,7 @@
 #include <iostream>
 #include "Utility.h"
 
-StringInput::StringInput(int w, int h) {
+StringInput::StringInput() {
     // Initialize the string
     str = "";
 }

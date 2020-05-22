@@ -17,7 +17,7 @@ class StringInput {
     bool rerenderpls;
 
     // Initializes variables
-    StringInput(SDL_Surface *screen, int w, int h);
+    StringInput();
 
     // Does clean up
     ~StringInput();
