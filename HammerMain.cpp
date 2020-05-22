@@ -811,7 +811,7 @@ void run() {
                 running = false;
             }
 
-            if (event.type == SDL_VIDEORESIZE) {
+            if (event.type == SDL_WINDOWEVENT_RESIZED) {
                 window = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_HWSURFACE | SDL_RESIZABLE);
             }
 
