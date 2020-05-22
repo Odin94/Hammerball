@@ -128,9 +128,9 @@ StringInput StrIn;
 StringInput StrInName;
 int inputcounter = 0;
 bool inputdone = false;
-SDL_Texture *text = NULL;
-SDL_Texture *name = NULL;
-SDL_Texture *name2 = NULL;
+SDL_Surface *text = NULL;
+SDL_Surface *name = NULL;
+SDL_Surface *name2 = NULL;
 
 Mix_Music *Stage1music = NULL;
 
