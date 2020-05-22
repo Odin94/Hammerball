@@ -91,35 +91,35 @@ TTF_Font *fontSmall = NULL;
 SDL_Color textColor = {30, 30, 30};
 SDL_Color bgcolor = {0, 0, 0};
 
-SDL_Surface *surfaces[10];
+SDL_Texture *surfaces[10];
 
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
-SDL_Surface *TitleScreen = NULL;
-SDL_Surface *HostingScreen = NULL;
-SDL_Surface *SettingsBG = NULL;
-SDL_Surface *ClientScreen = NULL;
-SDL_Surface *selection = NULL;
-SDL_Surface *ATile_ground = NULL;
-SDL_Surface *BTile_Spikes = NULL;
-SDL_Surface *BTile_Wall = NULL;
-SDL_Surface *PlayerSprite = NULL;
-SDL_Surface *PlayerDead = NULL;
-SDL_Surface *SpeedUp = NULL;
-SDL_Surface *PowerUp = NULL;
-SDL_Surface *Enemy_Knife = NULL;
-SDL_Surface *HealthBar = NULL;
-SDL_Surface *HealthBarFrame = NULL;
-SDL_Surface *Bullet = NULL;
-SDL_Surface *FallingTile = NULL;
+SDL_Texture *TitleScreen = NULL;
+SDL_Texture *HostingScreen = NULL;
+SDL_Texture *SettingsBG = NULL;
+SDL_Texture *ClientScreen = NULL;
+SDL_Texture *selection = NULL;
+SDL_Texture *ATile_ground = NULL;
+SDL_Texture *BTile_Spikes = NULL;
+SDL_Texture *BTile_Wall = NULL;
+SDL_Texture *PlayerSprite = NULL;
+SDL_Texture *PlayerDead = NULL;
+SDL_Texture *SpeedUp = NULL;
+SDL_Texture *PowerUp = NULL;
+SDL_Texture *Enemy_Knife = NULL;
+SDL_Texture *HealthBar = NULL;
+SDL_Texture *HealthBarFrame = NULL;
+SDL_Texture *Bullet = NULL;
+SDL_Texture *FallingTile = NULL;
 
-SDL_Surface *Borders = NULL;
+SDL_Texture *Borders = NULL;
 
-SDL_Surface *TEST = NULL;
-SDL_Surface *TEST2 = NULL;
+SDL_Texture *TEST = NULL;
+SDL_Texture *TEST2 = NULL;
 
-SDL_Surface *BallLethal = NULL;
-SDL_Surface *BallNonLethal = NULL;
+SDL_Texture *BallLethal = NULL;
+SDL_Texture *BallNonLethal = NULL;
 
 SDL_Rect healthrect;
 
@@ -127,9 +127,9 @@ StringInput StrIn();
 StringInput StrInName();
 int inputcounter = 0;
 bool inputdone = false;
-SDL_Surface *text = NULL;
-SDL_Surface *name = NULL;
-SDL_Surface *name2 = NULL;
+SDL_Texture *text = NULL;
+SDL_Texture *name = NULL;
+SDL_Texture *name2 = NULL;
 
 Mix_Music *Stage1music = NULL;
 
@@ -257,7 +257,7 @@ bool init() {
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
         success = false;
     }
-    renderer = SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+    renderer = SDL_CreateRenderer(window, -1, 0);
     if (renderer == NULL) {
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
         success = false;
