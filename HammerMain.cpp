@@ -3,11 +3,6 @@
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 #include <SDL_net.h>
-#include <Utility.h>
-#include <Actors.h>
-#include <Timer.h>
-#include <Tile.h>
-#include <StringInput.h>
 #include <SDL_ttf.h>
 #include <Math.h>
 #include <string>
@@ -15,6 +10,12 @@
 #include <fstream>
 #include <ctime>
 #include <iostream>
+#include "./Utility.h"
+#include "./Actors.h"
+#include "./Timer.h"
+#include "./Tile.h"
+#include "./StringInput.h"
+
 using namespace std;
 
 void initStage();
@@ -122,8 +123,8 @@ SDL_Surface *BallNonLethal = NULL;
 
 SDL_Rect healthrect;
 
-StringInput StrIn(window, SCREEN_WIDTH, SCREEN_HEIGHT);
-StringInput StrInName(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+StringInput StrIn();
+StringInput StrInName();
 int inputcounter = 0;
 bool inputdone = false;
 SDL_Surface *text = NULL;
