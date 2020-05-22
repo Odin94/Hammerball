@@ -17,7 +17,7 @@ SDL_Texture *load_texture(std::string path, SDL_Renderer *renderer) {
         printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
     } else {
         //Color key image
-        SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
+        SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xF0, 0, 0xFF));
 
         //Create texture from surface pixels
         newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
@@ -36,7 +36,9 @@ SDL_Texture *load_texture(std::string path, SDL_Renderer *renderer) {
 SDL_Texture *load_from_rendered_text(TTF_Font *font, std::string text, SDL_Color text_color, SDL_Renderer *renderer) {
     SDL_Texture *texture = NULL;
 
-    if (text.empty()) text = " ";
+    if (text.empty()) {
+        text = " ";
+    }
 
     //Render text surface
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, text.c_str(), text_color);
