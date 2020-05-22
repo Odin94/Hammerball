@@ -5,7 +5,7 @@ I've recently discovered the code on my old hard drive and am now looking to cle
 
 
 ## Dependencies
-Unpack the 32bit version of the following dependencies into `C:\mingw_dev_lib`
+Unpack the 64bit version (has to match your mingw installation) of the following dependencies into `C:\mingw_dev_lib`
 
 * SDL 2 (http://libsdl.org/download-2.0.php SDL2-devel-2.0.12-mingw.tar.gz)
 * SDL_net (https://www.libsdl.org/projects/SDL_net/ SDL2_net-devel-2.0.1-mingw.tar.gz)
