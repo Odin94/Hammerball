@@ -262,31 +262,31 @@ bool init() {
 
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096); // init mixer
 
-    ATile_ground = load_texture("res/ground.png");
-    BTile_Wall = load_texture("res/Wall.png");
-    FallingTile = load_texture("res/falltile.png");
+    ATile_ground = load_texture("res/ground.png", renderer);
+    BTile_Wall = load_texture("res/Wall.png", renderer);
+    FallingTile = load_texture("res/falltile.png", renderer);
 
-    PlayerSprite = load_texture("res/Ironman.png");
-    PlayerDead = load_texture("res/PlayerDead.png");
+    PlayerSprite = load_texture("res/Ironman.png", renderer);
+    PlayerDead = load_texture("res/PlayerDead.png", renderer);
 
-    TitleScreen = load_texture("res/Title.png");
-    HostingScreen = load_texture("res/Hosting.png");
-    ClientScreen = load_texture("res/Client.png");
-    SettingsBG = load_texture("res/Settings.png");
+    TitleScreen = load_texture("res/Title.png", renderer);
+    HostingScreen = load_texture("res/Hosting.png", renderer);
+    ClientScreen = load_texture("res/Client.png", renderer);
+    SettingsBG = load_texture("res/Settings.png", renderer);
 
-    SpeedUp = load_texture("res/SpeedUp.png");
-    PowerUp = load_texture("res/PowerUp.png");
+    SpeedUp = load_texture("res/SpeedUp.png", renderer);
+    PowerUp = load_texture("res/PowerUp.png", renderer);
 
-    HealthBar = load_texture("res/healthbar.png");
-    HealthBarFrame = load_texture("res/HealthBarFrame.png");
+    HealthBar = load_texture("res/healthbar.png", renderer);
+    HealthBarFrame = load_texture("res/HealthBarFrame.png", renderer);
 
-    BallLethal = load_texture("res/Ball.png");
-    BallNonLethal = load_texture("res/Ballnonlethal.png");
+    BallLethal = load_texture("res/Ball.png", renderer);
+    BallNonLethal = load_texture("res/Ballnonlethal.png", renderer);
 
-    Borders = load_texture("res/Borders.png");
+    Borders = load_texture("res/Borders.png", renderer);
 
-    TEST = load_texture("res/asphaltdecal.png");
-    TEST2 = load_texture("res/asphaltdecal2.png");
+    TEST = load_texture("res/asphaltdecal.png", renderer);
+    TEST2 = load_texture("res/asphaltdecal2.png", renderer);
 
     string xxy = "";
     text = TTF_RenderText_Solid(font, xxy.c_str(), textColor);
