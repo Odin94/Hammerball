@@ -6,36 +6,30 @@
 #include <iostream>
 #include <string>
 
-SDL_Surface *load_image(SDL_Window *window, std::string filename) {
-    // The image that's loaded
-    SDL_Surface *loadedImage = NULL;
+SDL_Texture *load_texture(std::string path) {
+    //The final texture
+    SDL_Texture *newTexture = NULL;
 
-    // The optimized surface that will be used
-    SDL_Surface *optimizedImage = NULL;
+    //Load image at specified path
+    SDL_Surface *loadedSurface = IMG_Load(path.c_str());
+    if (loadedSurface == NULL) {
+        printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
+    } else {
+        //Color key image
+        SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
 
-    // Load the image
-    loadedImage = IMG_Load(filename.c_str());
-
-    // If the image loaded
-    if (loadedImage != NULL) {
-        // Create an optimized surface
-        optimizedImage = SDL_ConvertSurfaceFormat(loadedImage, SDL_GetWindowPixelFormat(window), 0);
-
-        // Free the old surface
-        SDL_FreeSurface(loadedImage);
-
-        // If the surface was optimized
-        if (optimizedImage != NULL) {
-            // Map the color key
-            Uint32 colorkey = SDL_MapRGB(optimizedImage->format, 0xF0, 0, 0xFF);
-
-            // Set all pixels of color R 0, G 0xFF, B 0xFF to be transparent
-            SDL_SetColorKey(optimizedImage, SDL_SRCCOLORKEY, colorkey);
+        //Create texture from surface pixels
+        newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
+        if (newTexture == NULL) {
+            printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
         }
+
+        //Get rid of old loaded surface
+        SDL_FreeSurface(loadedSurface);
     }
 
-    // Return the optimized surface
-    return optimizedImage;
+    //Return success
+    return newTexture;
 }
 
 void apply_surface(float drawscale, int x, int y, SDL_Surface *source, SDL_Surface *destination, SDL_Rect *clip) // clip is defaulted to NULL!!
