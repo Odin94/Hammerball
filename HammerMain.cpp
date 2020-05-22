@@ -128,9 +128,9 @@ StringInput StrIn;
 StringInput StrInName;
 int inputcounter = 0;
 bool inputdone = false;
-SDL_Surface *text = NULL;
-SDL_Surface *name = NULL;
-SDL_Surface *name2 = NULL;
+SDL_Texture *text = NULL;
+SDL_Texture *name = NULL;
+SDL_Texture *name2 = NULL;
 
 Mix_Music *Stage1music = NULL;
 
@@ -299,9 +299,9 @@ bool init() {
     TEST2 = load_texture("res/asphaltdecal2.png", renderer);
 
     string xxy = "";
-    text = TTF_RenderText_Solid(font, xxy.c_str(), textColor);
-    name = TTF_RenderText_Solid(font, xxy.c_str(), textColor);
-    name2 = TTF_RenderText_Solid(fontSmall, xxy.c_str(), textColor);
+    text = load_from_rendered_text(font, xxy, textColor, renderer);
+    name = load_from_rendered_text(font, xxy, textColor, renderer);
+    name2 = load_from_rendered_text(fontSmall, xxy, textColor, renderer);
 
     surfaces[0] = ATile_ground;
     surfaces[1] = BTile_Spikes;
@@ -377,98 +377,101 @@ void initStage() {
 void draw() {
     if (multiplayer && inTitle) {
         if (isHost) {
-            apply_surface(drawscale, 0, 0, HostingScreen, window);
+            apply_surface(drawscale, 0, 0, HostingScreen, renderer);
         } else {
-            apply_surface(drawscale, 0, 0, ClientScreen, window);
+            apply_surface(drawscale, 0, 0, ClientScreen, renderer);
         }
     } else if (inTitle) {
         if (!inputdone) {
-            apply_surface(drawscale, 0, 0, SettingsBG, window);
-            apply_surface(drawscale, 600, 200, text, window);
-            apply_surface(drawscale, 600, 680, name, window);
+            apply_surface(drawscale, 0, 0, SettingsBG, renderer);
+            apply_surface(drawscale, 600, 200, text, renderer);
+            apply_surface(drawscale, 600, 680, name, renderer);
         } else {
-            apply_surface(drawscale, 0, 0, TitleScreen, window);
+            apply_surface(drawscale, 0, 0, TitleScreen, renderer);
         }
     } else {
         for (int i = 0; i < 25; i++) {
             for (int j = 0; j < 15; j++) {
                 if (ATiles[i][j].active) {
-                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, surfaces[ATiles[i][j].img], window, &ATiles[i][j].clip_rect);
+                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, surfaces[ATiles[i][j].img], renderer, &ATiles[i][j].clip_rect);
                 }
                 if (ATiles[i][j].needsBorder) { // check if borders from top, left, right or bottom need to be drawn
                     if (!ATiles[i - 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, window, 0, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, renderer, 0, 0, 64, 64);
                     }
                     if (!ATiles[i + 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, window, 67, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, renderer, 67, 0, 64, 64);
                     }
                     if (!ATiles[i][j - 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, window, 134, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, renderer, 134, 0, 64, 64);
                     }
                     if (!ATiles[i][j + 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, window, 201, 0, 64, 64);
+                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, Borders, renderer, 201, 0, 64, 64);
                     }
                 }
                 if (BTiles[i][j].active) {
-                    apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y, surfaces[BTiles[i][j].img], window, &BTiles[i][j].clip_rect);
+                    apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y, surfaces[BTiles[i][j].img], renderer, &BTiles[i][j].clip_rect);
                 }
             }
         }
 
         if (upgrade.active) {
             if (upgrade.type == 's') {
-                apply_surface(drawscale, upgrade.x, upgrade.y, SpeedUp, window);
+                apply_surface(drawscale, upgrade.x, upgrade.y, SpeedUp, renderer);
             }
             if (upgrade.type == 'p') {
-                apply_surface(drawscale, upgrade.x, upgrade.y, PowerUp, window);
+                apply_surface(drawscale, upgrade.x, upgrade.y, PowerUp, renderer);
             }
         }
 
         if (!multiplayer && !localmultiplayer) {
             if (ai.alive) {
-                apply_surface(drawscale, ai.x, ai.y, PlayerSprite, window, &ai.clip_rect);
+                apply_surface(drawscale, ai.x, ai.y, PlayerSprite, renderer, &ai.clip_rect);
             } else {
-                apply_surface(drawscale, ai.x, ai.y, PlayerDead, window);
+                apply_surface(drawscale, ai.x, ai.y, PlayerDead, renderer);
             }
         }
 
         if (player.alive) {
-            apply_surface(drawscale, player.x, player.y, PlayerSprite, window, &player.clip_rect);
+            apply_surface(drawscale, player.x, player.y, PlayerSprite, renderer, &player.clip_rect);
         } else {
-            apply_surface(drawscale, player.x, player.y, PlayerDead, window);
+            apply_surface(drawscale, player.x, player.y, PlayerDead, renderer);
         }
         if (multiplayer || localmultiplayer) {
             if (player2.alive) {
-                apply_surface(drawscale, player2.x, player2.y, PlayerSprite, window, &player2.clip_rect);
+                apply_surface(drawscale, player2.x, player2.y, PlayerSprite, renderer, &player2.clip_rect);
             } else {
-                apply_surface(drawscale, player2.x, player2.y, PlayerDead, window);
+                apply_surface(drawscale, player2.x, player2.y, PlayerDead, renderer);
             }
             if (playercount > 2 && player3.alive) {
-                apply_surface(drawscale, player3.x, player3.y, PlayerSprite, window, &player3.clip_rect);
+                apply_surface(drawscale, player3.x, player3.y, PlayerSprite, renderer, &player3.clip_rect);
                 if (playercount > 3 && player4.alive) {
-                    apply_surface(drawscale, player4.x, player4.y, PlayerSprite, window, &player4.clip_rect);
+                    apply_surface(drawscale, player4.x, player4.y, PlayerSprite, renderer, &player4.clip_rect);
                 }
             }
         }
 
         if (ball.lethal) {
-            apply_surface(drawscale, ball.x, ball.y, BallLethal, window);
+            apply_surface(drawscale, ball.x, ball.y, BallLethal, renderer);
         } else {
-            apply_surface(drawscale, ball.x, ball.y, BallNonLethal, window);
+            apply_surface(drawscale, ball.x, ball.y, BallNonLethal, renderer);
         }
 
         // draw UI
-        apply_surface(drawscale, player.x, player.y - 25, name, window);
-        apply_surface(drawscale, player2.x, player2.y - 25, name2, window);
-        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBarFrame, window);
+        apply_surface(drawscale, player.x, player.y - 25, name, renderer);
+        apply_surface(drawscale, player2.x, player2.y - 25, name2, renderer);
+        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBarFrame, renderer);
 
         healthrect.w = 105 - (100 - player.health);
-        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBar, window, &healthrect);
-
-        //    apply_surface(64*5, 64*5, TEST, screen);
-        //   apply_surface(64*2,64*2, TEST2, screen);
+        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, HealthBar, renderer, &healthrect);
     }
-    SDL_Flip(window);
+
+    //Clear screen
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(renderer);
+
+    //Update screen
+    SDL_RenderPresent(renderer);
 }
 
 void handleMP() // TCP introduction makes both sides crash when moving the
@@ -817,13 +820,13 @@ void run() {
                     if (inputcounter == 0) {
                         StrIn.handle_input(event);
                         if (StrIn.rerenderpls) {
-                            text = TTF_RenderText_Solid(font, StrIn.str.c_str(), textColor);
+                            text = load_from_rendered_text(font, StrIn.str, textColor, renderer);
                             StrIn.rerenderpls = false;
                         }
                     } else if (inputcounter == 1) {
                         StrInName.handle_input(event);
                         if (StrInName.rerenderpls) {
-                            name = TTF_RenderText_Solid(font, StrInName.str.c_str(), textColor);
+                            name = load_from_rendered_text(font, StrInName.str, textColor, renderer);
                             StrInName.rerenderpls = false;
                         }
                     }
@@ -843,7 +846,7 @@ void run() {
                                     localmultiplayer = true;
                                 }
                             }
-                            name = TTF_RenderText_Solid(fontSmall, StrInName.str.c_str(), textColor);
+                            name = load_from_rendered_text(fontSmall, StrInName.str, textColor, renderer);
                             inputdone = true;
                         }
                     }
@@ -901,7 +904,7 @@ void run() {
                     string TCPmessage = "H" + StrInName.str;
                     SDLNet_TCP_Send(TCPClient, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
                     SDLNet_TCP_Recv(TCPClient, TCPBufferClt, 16);
-                    name2 = TTF_RenderText_Solid(fontSmall, TCPBufferClt, textColor);
+                    name2 = load_from_rendered_text(fontSmall, TCPBufferClt, textColor, renderer);
 
                     if (playercount > 2) {
                         SDLNet_TCP_Send(TCPClient2, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
@@ -924,7 +927,7 @@ void run() {
                         for (int i = 0; i < 16; i++) {
                             name2array[i] = TCPBufferClt[i + 1];
                         }
-                        name2 = TTF_RenderText_Solid(fontSmall, name2array, textColor);
+                        name2 = load_from_rendered_text(fontSmall, name2array, textColor, renderer);
                     }
                 } else {
                     fprintf(stderr, "SDLNet_TCP_Open: %s\n", SDLNet_GetError());

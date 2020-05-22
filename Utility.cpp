@@ -7,8 +7,7 @@
 #include <string>
 #include <cstring>
 
-
-SDL_Texture *load_texture(std::string path, SDL_Renderer* renderer) {
+SDL_Texture *load_texture(std::string path, SDL_Renderer *renderer) {
     //The final texture
     SDL_Texture *newTexture = NULL;
 
@@ -34,7 +33,29 @@ SDL_Texture *load_texture(std::string path, SDL_Renderer* renderer) {
     return newTexture;
 }
 
-void apply_surface(float drawscale, int x, int y, SDL_Surface *source, SDL_Surface *destination, SDL_Rect *clip) // clip is defaulted to NULL!!
+SDL_Texture *load_from_rendered_text(TTF_Font *font, std::string text, SDL_Color text_color, SDL_Renderer *renderer) {
+    SDL_Texture *texture = NULL;
+
+    //Render text surface
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, text.c_str(), text_color);
+    if (textSurface == NULL) {
+        printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+    } else {
+        //Create texture from surface pixels
+        texture = SDL_CreateTextureFromSurface(renderer, textSurface);
+        if (texture == NULL) {
+            printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+        }
+
+        //Get rid of old surface
+        SDL_FreeSurface(textSurface);
+    }
+
+    //Return success
+    return texture;
+}
+
+void apply_surface(float drawscale, int x, int y, SDL_Texture *texture, SDL_Renderer *renderer, SDL_Rect *clip) // clip is defaulted to NULL!!
 {
     // Holds offsets
     SDL_Rect offset;
@@ -44,17 +65,16 @@ void apply_surface(float drawscale, int x, int y, SDL_Surface *source, SDL_Surfa
     offset.y = y * drawscale;
 
     if (clip == NULL) {
-        // Blit
-        SDL_BlitSurface(source, clip, destination, &offset);
+        SDL_RenderCopy(renderer, texture, clip, &offset);
     } else {
         SDL_Rect clipScaled = {clip->x * drawscale, clip->y * drawscale, clip->w * drawscale, clip->h * drawscale};
-        SDL_BlitSurface(source, &clipScaled, destination, &offset);
+        SDL_RenderCopy(renderer, texture, &clipScaled, &offset);
     }
 }
 
-void apply_surface(float drawscale, int x, int y, SDL_Surface *source, SDL_Surface *destination, int xr, int yr, int w, int h) {
+void apply_surface(float drawscale, int x, int y, SDL_Texture *texture, SDL_Renderer *renderer, int xr, int yr, int w, int h) {
     SDL_Rect rekt = {xr, yr, w, h};
-    apply_surface(drawscale, x, y, source, destination, &rekt);
+    apply_surface(drawscale, x, y, texture, renderer, &rekt);
 }
 
 std::string toStr(int number) {
