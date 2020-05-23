@@ -28,6 +28,8 @@ const int SCREEN_WIDTH = 1600; // 25 tiles
 const int SCREEN_HEIGHT = 960; // 15 tiles
 const int SCREEN_BPP = 32;
 const int DTS = 64; // default tile size
+const int TILE_COUNT_X = SCREEN_WIDTH / DTS;
+const int TILE_COUNT_Y = SCREEN_HEIGHT / DTS;
 
 const int GROUND_TILE = 0;
 const int SPIKES_TILE = 1;
@@ -48,8 +50,8 @@ int mousey;
 
 fstream map;
 
-EventTile ATiles[25][15]; // background
-EventTile BTiles[25][15]; // things that lie on the ground
+EventTile ATiles[TILE_COUNT_X][TILE_COUNT_Y]; // background
+EventTile BTiles[TILE_COUNT_X][TILE_COUNT_Y]; // things that lie on the ground
 
 bool inTitle = true;
 
@@ -300,8 +302,8 @@ bool init_settings() {
 
 void create_map() {
     map.open(map_path, ios::out);
-    for (int i = 0; i < 25; i++) {
-        for (int j = 0; j < 15; j++) {
+    for (int i = 0; i < TILE_COUNT_X; i++) {
+        for (int j = 0; j < TILE_COUNT_Y; j++) {
             if ((i == 6 || i == 18) && j > 4 && j < 11) {
                 map << "-1,0," << WALL_TILE << ",0,0,0,1,0,0,0 ";
             } else if (j == 0 || j == 14 || i == 0 || i == 24) {
@@ -379,8 +381,8 @@ bool init_stage() {
     int rnd;
 
     string mapContent;
-    for (int i = 0; i < 25; i++) {
-        for (int j = 0; j < 15; j++) {
+    for (int i = 0; i < TILE_COUNT_X; i++) {
+        for (int j = 0; j < TILE_COUNT_Y; j++) {
             rnd = (rand() % 3);
             ATiles[i][j].clip_rect.x = rnd * DTS + 1;
             if (ATiles[i][j].clip_rect.x == 1) {
@@ -450,8 +452,8 @@ void draw_title() {
 }
 
 void draw_tiles() {
-    for (int i = 0; i < 25; i++) {
-        for (int j = 0; j < 15; j++) {
+    for (int i = 0; i < TILE_COUNT_X; i++) {
+        for (int j = 0; j < TILE_COUNT_Y; j++) {
             if (ATiles[i][j].active) {
                 apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, textures[ATiles[i][j].img], renderer, &ATiles[i][j].clip_rect);
             }
@@ -734,8 +736,7 @@ void handleMP() // TCP introduction makes both sides crash when moving the
     }
 }
 
-void update(Uint32 delta) {
-    // PLAYER STUFF
+void update_local_player(Uint32 delta) {
     if (player.alive) {
         player.move(delta, ATiles, ball.x, ball.y, ball.lethal);
 
@@ -750,7 +751,9 @@ void update(Uint32 delta) {
             player.alive = false;
         }
     }
+}
 
+void update_multiplayer_players(Uint32 delta) {
     if (localmultiplayer && player2.alive) {
         player2.move(delta, ATiles, ball.x, ball.y, ball.lethal);
 
@@ -760,26 +763,27 @@ void update(Uint32 delta) {
             player2.clip_rect.x = 0;
         }
     }
+}
 
-    // Tiles
-    for (int i = 0; i < 25; i++) {
-        for (int j = 0; j < 15; j++) {
-            ATiles[i][j].update(delta);
-            BTiles[i][j].update(delta);
+void update_tiles(Uint32 delta) {
+    for (int x = 0; x < TILE_COUNT_X; x++) {
+        for (int y = 0; y < TILE_COUNT_Y; y++) {
+            ATiles[x][y].update(delta);
+            BTiles[x][y].update(delta);
         }
     }
+}
 
-    // UPGRADE STUFF
-    if (!upgrade.active &&
-        UpgradeSpawner.get_ticks() > 10000) // if 10sec since last upgrade got taken
+void update_upgrade() {
+    if (!upgrade.active && UpgradeSpawner.get_ticks() > 10000) // if 10sec since last upgrade got taken
     {
-        int ux = 0; // rand() % 25;
-        int uy = rand() % 15;
+        int ux = 0; // rand() % TILE_COUNT_X;
+        int uy = rand() % TILE_COUNT_Y;
 
         int x = 0;
         while (!ATiles[ux][uy].traversable || !BTiles[ux][uy].traversable) {
-            ux = rand() % 25;
-            uy = rand() % 15;
+            ux = rand() % TILE_COUNT_X;
+            uy = rand() % TILE_COUNT_Y;
         }
 
         upgrade.set(ux * DTS, uy * DTS, DTS, DTS, 0, 0);
@@ -857,8 +861,9 @@ void update(Uint32 delta) {
             UpgradeSpawner.start();
         }
     }
+}
 
-    // AI STUFF
+void update_ai(Uint32 delta) {
     if ((!multiplayer && !localmultiplayer)) {
         if (ai.alive) {
             ai.update(&ball, player, delta, ATiles);
@@ -868,8 +873,9 @@ void update(Uint32 delta) {
             ai.alive = false;
         }
     }
+}
 
-    // BALL STUFF (huehue)
+void update_ball(Uint32 delta) {
     if (isHost) {
         ball.move(delta, ATiles);
         if (abs(ball.velx) > 10 || abs(ball.vely) > 10) {
@@ -887,14 +893,25 @@ void update(Uint32 delta) {
             player2.alive = false;
         }
     }
+}
 
+void update_clickspamprevent0r() {
     if (clickspamprevent0r.started && clickspamprevent0r.get_ticks() > 500) {
         clickspamprevent0r.stop();
     }
-    if (localmultiplayer && clickspamprevent0r2.started &&
-        clickspamprevent0r2.get_ticks() > 500) {
+    if (localmultiplayer && clickspamprevent0r2.started && clickspamprevent0r2.get_ticks() > 500) {
         clickspamprevent0r2.stop();
     }
+}
+
+void update(Uint32 delta) {
+    update_local_player(delta);
+    update_multiplayer_players(delta);
+    update_tiles(delta);
+    update_ai(delta);
+    update_ball(delta);
+    update_upgrade();
+    update_clickspamprevent0r();
 }
 
 void run() {
