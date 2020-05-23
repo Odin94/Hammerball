@@ -198,12 +198,17 @@ bool init() {
     font = TTF_OpenFont("res/Demonized.ttf", 28);
     fontSmall = TTF_OpenFont("res/Demonized.ttf", 12);
 
-    window = SDL_CreateWindow("Hammerball", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SDL_WINDOW_OPENGL /*SDL_WINDOW_FULLSCREEN */);
+    //Set texture filtering to linear
+    if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
+        printf("Warning: Linear texture filtering not enabled!");
+    }
+
+    window = SDL_CreateWindow("Hammerball", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * drawscale, SCREEN_HEIGHT * drawscale, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window == NULL) {
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
         success = false;
     }
-    renderer = SDL_CreateRenderer(window, -1, 0);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == NULL) {
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
         success = false;
@@ -924,9 +929,9 @@ void run() {
                 running = false;
             }
 
-            if (event.type == SDL_WINDOWEVENT_RESIZED) {
-                // SDL_CreateWindow("Hammerball", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,event.resize.w, event.resize.h, SDL_WINDOW_OPENGL);
-                // window = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_HWSURFACE | SDL_RESIZABLE);
+            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+                SDL_Rect new_viewport = {0, 0, event.window.data1, event.window.data2};
+                SDL_RenderSetLogicalSize(renderer, event.window.data1, event.window.data2);
             }
 
             if (event.type == SDL_KEYDOWN || event.type == SDL_TEXTINPUT) {
