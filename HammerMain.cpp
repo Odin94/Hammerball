@@ -371,109 +371,149 @@ void initStage() {
     ATiles[11][11].clip_rect.x = 0;
 }
 
+void draw_multiplayer_title() {
+    if (isHost) {
+        apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, HostingScreen, renderer);
+    } else {
+        apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ClientScreen, renderer);
+    }
+}
+
+void draw_singleplayer_title() {
+    if (!inputdone) {
+        apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SettingsBG, renderer);
+
+        int textW, textH;
+        SDL_QueryTexture(text, NULL, NULL, &textW, &textH);
+        int nameW, nameH;
+        SDL_QueryTexture(name, NULL, NULL, &nameW, &nameH);
+        apply_surface(drawscale, 600, 200, textW, textH, text, renderer);
+        apply_surface(drawscale, 600, 680, nameW, nameH, name, renderer);
+    } else {
+        apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, TitleScreen, renderer);
+    }
+}
+
+void draw_title() {
+    if (multiplayer) {
+        draw_multiplayer_title();
+    } else {
+        draw_singleplayer_title();
+    }
+}
+
+void draw_tiles() {
+    for (int i = 0; i < 25; i++) {
+        for (int j = 0; j < 15; j++) {
+            if (ATiles[i][j].active) {
+                apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, textures[ATiles[i][j].img], renderer, &ATiles[i][j].clip_rect);
+            }
+            if (ATiles[i][j].needsBorder) { // check if borders from top, left, right or bottom need to be drawn
+                if (!ATiles[i - 1][j].needsBorder) {
+                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 0, 0, DTS, DTS);
+                }
+                if (!ATiles[i + 1][j].needsBorder) {
+                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 67, 0, DTS, DTS);
+                }
+                if (!ATiles[i][j - 1].needsBorder) {
+                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 134, 0, DTS, DTS);
+                }
+                if (!ATiles[i][j + 1].needsBorder) {
+                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 201, 0, DTS, DTS);
+                }
+            }
+            if (BTiles[i][j].active) {
+                apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y, DTS, DTS, textures[BTiles[i][j].img], renderer, &BTiles[i][j].clip_rect);
+            }
+        }
+    }
+}
+
+void draw_upgrades() {
+    if (upgrade.active) {
+        if (upgrade.type == 's') {
+            apply_surface(drawscale, upgrade.x, upgrade.y, DTS, DTS, SpeedUp, renderer);
+        }
+        if (upgrade.type == 'p') {
+            apply_surface(drawscale, upgrade.x, upgrade.y, DTS, DTS, PowerUp, renderer);
+        }
+    }
+}
+
+void draw_ai() {
+    if (!multiplayer && !localmultiplayer) {
+        if (ai.alive) {
+            apply_surface(drawscale, ai.x, ai.y, DTS, DTS, PlayerSprite, renderer, &ai.clip_rect);
+        } else {
+            apply_surface(drawscale, ai.x, ai.y, DTS, DTS, PlayerDead, renderer);
+        }
+    }
+}
+
+void draw_local_player() {
+    if (player.alive) {
+        apply_surface(drawscale, player.x, player.y, DTS, DTS, PlayerSprite, renderer, &player.clip_rect);
+    } else {
+        apply_surface(drawscale, player.x, player.y, DTS, DTS, PlayerDead, renderer);
+    }
+}
+
+void draw_multiplayer_players() {
+    if (multiplayer || localmultiplayer) {
+        if (player2.alive) {
+            apply_surface(drawscale, player2.x, player2.y, DTS, DTS, PlayerSprite, renderer, &player2.clip_rect);
+        } else {
+            apply_surface(drawscale, player2.x, player2.y, DTS, DTS, PlayerDead, renderer);
+        }
+        if (playercount > 2 && player3.alive) {
+            apply_surface(drawscale, player3.x, player3.y, DTS, DTS, PlayerSprite, renderer, &player3.clip_rect);
+            if (playercount > 3 && player4.alive) {
+                apply_surface(drawscale, player4.x, player4.y, DTS, DTS, PlayerSprite, renderer, &player4.clip_rect);
+            }
+        }
+    }
+}
+
+void draw_ball() {
+    if (ball.lethal) {
+        apply_surface(drawscale, ball.x, ball.y, DTS, DTS, BallLethal, renderer);
+    } else {
+        apply_surface(drawscale, ball.x, ball.y, DTS, DTS, BallNonLethal, renderer);
+    }
+}
+
+void draw_ui() {
+    int nameW, nameH;
+    SDL_QueryTexture(name, NULL, NULL, &nameW, &nameH);
+    int name2W, name2H;
+    SDL_QueryTexture(name2, NULL, NULL, &name2W, &name2H);
+    apply_surface(drawscale, player.x, player.y - 25, nameW, nameH, name, renderer);
+    apply_surface(drawscale, player2.x, player2.y - 25, name2W, name2H, name2, renderer);
+
+    apply_surface(drawscale, SCREEN_WIDTH - 132, 0, 109, 32, HealthBarFrame, renderer);
+    healthrect.w = 105 - (100 - player.health);
+    apply_surface(drawscale, SCREEN_WIDTH - 132, 0, 109, 32, HealthBar, renderer, &healthrect);
+}
+
+void draw_active_game() {
+    draw_tiles();
+    draw_upgrades();
+    draw_ai();
+    draw_local_player();
+    draw_multiplayer_players();
+    draw_ball();
+    draw_ui();
+}
+
 void draw() {
     //Clear screen
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
 
-    if (multiplayer && inTitle) {
-        if (isHost) {
-            apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, HostingScreen, renderer);
-        } else {
-            apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ClientScreen, renderer);
-        }
-    } else if (inTitle) {
-        if (!inputdone) {
-            apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SettingsBG, renderer);
-
-            int textW, textH;
-            SDL_QueryTexture(text, NULL, NULL, &textW, &textH);
-            int nameW, nameH;
-            SDL_QueryTexture(name, NULL, NULL, &nameW, &nameH);
-            apply_surface(drawscale, 600, 200, textW, textH, text, renderer);
-            apply_surface(drawscale, 600, 680, nameW, nameH, name, renderer);
-        } else {
-            apply_surface(drawscale, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, TitleScreen, renderer);
-        }
+    if (inTitle) {
+        draw_title();
     } else {
-        for (int i = 0; i < 25; i++) {
-            for (int j = 0; j < 15; j++) {
-                if (ATiles[i][j].active) {
-                    apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, textures[ATiles[i][j].img], renderer, &ATiles[i][j].clip_rect);
-                }
-                if (ATiles[i][j].needsBorder) { // check if borders from top, left, right or bottom need to be drawn
-                    if (!ATiles[i - 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 0, 0, DTS, DTS);
-                    }
-                    if (!ATiles[i + 1][j].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 67, 0, DTS, DTS);
-                    }
-                    if (!ATiles[i][j - 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 134, 0, DTS, DTS);
-                    }
-                    if (!ATiles[i][j + 1].needsBorder) {
-                        apply_surface(drawscale, ATiles[i][j].x, ATiles[i][j].y, DTS, DTS, Borders, renderer, 201, 0, DTS, DTS);
-                    }
-                }
-                if (BTiles[i][j].active) {
-                    apply_surface(drawscale, BTiles[i][j].x, BTiles[i][j].y, DTS, DTS, textures[BTiles[i][j].img], renderer, &BTiles[i][j].clip_rect);
-                }
-            }
-        }
-
-        if (upgrade.active) {
-            if (upgrade.type == 's') {
-                apply_surface(drawscale, upgrade.x, upgrade.y, DTS, DTS, SpeedUp, renderer);
-            }
-            if (upgrade.type == 'p') {
-                apply_surface(drawscale, upgrade.x, upgrade.y, DTS, DTS, PowerUp, renderer);
-            }
-        }
-
-        if (!multiplayer && !localmultiplayer) {
-            if (ai.alive) {
-                apply_surface(drawscale, ai.x, ai.y, DTS, DTS, PlayerSprite, renderer, &ai.clip_rect);
-            } else {
-                apply_surface(drawscale, ai.x, ai.y, DTS, DTS, PlayerDead, renderer);
-            }
-        }
-
-        if (player.alive) {
-            apply_surface(drawscale, player.x, player.y, DTS, DTS, PlayerSprite, renderer, &player.clip_rect);
-        } else {
-            apply_surface(drawscale, player.x, player.y, DTS, DTS, PlayerDead, renderer);
-        }
-        if (multiplayer || localmultiplayer) {
-            if (player2.alive) {
-                apply_surface(drawscale, player2.x, player2.y, DTS, DTS, PlayerSprite, renderer, &player2.clip_rect);
-            } else {
-                apply_surface(drawscale, player2.x, player2.y, DTS, DTS, PlayerDead, renderer);
-            }
-            if (playercount > 2 && player3.alive) {
-                apply_surface(drawscale, player3.x, player3.y, DTS, DTS, PlayerSprite, renderer, &player3.clip_rect);
-                if (playercount > 3 && player4.alive) {
-                    apply_surface(drawscale, player4.x, player4.y, DTS, DTS, PlayerSprite, renderer, &player4.clip_rect);
-                }
-            }
-        }
-
-        if (ball.lethal) {
-            apply_surface(drawscale, ball.x, ball.y, DTS, DTS, BallLethal, renderer);
-        } else {
-            apply_surface(drawscale, ball.x, ball.y, DTS, DTS, BallNonLethal, renderer);
-        }
-
-        // draw UI
-        int nameW, nameH;
-        SDL_QueryTexture(name, NULL, NULL, &nameW, &nameH);
-        int name2W, name2H;
-        SDL_QueryTexture(name2, NULL, NULL, &name2W, &name2H);
-        apply_surface(drawscale, player.x, player.y - 25, nameW, nameH, name, renderer);
-        apply_surface(drawscale, player2.x, player2.y - 25, name2W, name2H, name2, renderer);
-        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, 109, 32, HealthBarFrame, renderer);
-
-        healthrect.w = 105 - (100 - player.health);
-        apply_surface(drawscale, SCREEN_WIDTH - 132, 0, 109, 32, HealthBar, renderer, &healthrect);
+        draw_active_game();
     }
 
     //Update screen
