@@ -166,3 +166,14 @@ int *charAToIntA(char **in, int size) {
 
     return output;
 }
+
+float approach_zero(float num, float step) {
+    if (abs(num) < step) {
+        return 0;
+    }
+    if (num > 0) {
+        return num - step;
+    }
+
+    return num + step;
+}

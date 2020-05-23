@@ -97,7 +97,7 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally, bool 
 
     // x+=velx* ( deltaT / 60.f );//.f interprets it a float; divide by expected
     // MS since last frame (30fps -> /30)
-    y += vely * (deltaT / 60.f);
+    int y_movement = vely * (deltaT / 60.f);
 
     // check map boundaries (TODO: replace 960 with var)
     if (y + h > 960) {
@@ -108,32 +108,20 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally, bool 
     }
 
     // check walls
-    
-    if (vely > 0) {
-        EventTile colliding_tile_right = BTiles[int((x + w) / 64)][int(ceil((y + h) / 64))];
-        if (!colliding_tile_right.traversable && y + h > colliding_tile_right.y) {
-            y = colliding_tile_right.y - h - 1;
-        }
 
-        EventTile colliding_tile_left = BTiles[int(x / 64)][int(ceil((y + h) / 64))];
-        if (!colliding_tile_left.traversable && y + h > colliding_tile_left.y) {
-            y = colliding_tile_left.y - h - 1;
+    if (vely != 0) {
+        for (int i = 0; i < 25; i++) {
+            for (int j = 0; j < 15; j++) {
+                EventTile colliding_tile = BTiles[i][j];
+                while (!colliding_tile.traversable && checkCollision(x, y + y_movement, w, h, colliding_tile.x, colliding_tile.y, colliding_tile.w, colliding_tile.h)) {
+                    y_movement = approach_zero(y_movement, 0.25);
+                }
+            }
         }
+        y += y_movement;
     }
 
-    if (vely < 0) {
-        EventTile colliding_tile_right = BTiles[int(floor((x + w) / 64))][int(y / 64)];
-        if (!colliding_tile_right.traversable && y < colliding_tile_right.y + colliding_tile_right.h) {
-            y = colliding_tile_right.y + colliding_tile_right.h + 1;
-        }
-
-        EventTile colliding_tile_left = BTiles[int(floor(x / 64))][int(y / 64)];
-        if (!colliding_tile_left.traversable && y < colliding_tile_left.y + colliding_tile_left.h) {
-            y = colliding_tile_left.y + colliding_tile_left.h + 1;
-        }
-    }
-
-    x += velx * (deltaT / 60.f);
+    int x_movement = velx * (deltaT / 60.f);
 
     // check map boundaries (TODO: replace 1600 with var)
     if (x + w > 1600) {
@@ -144,43 +132,36 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally, bool 
     }
 
     // TODO: replace 64 with DTS
-    if (velx > 0) {
-        EventTile colliding_tile_bottom = BTiles[int(ceil(x + w) / 64)][int((y + h) / 64)];
-        if (!colliding_tile_bottom.traversable && x + w > colliding_tile_bottom.x) {
-            x = colliding_tile_bottom.x - w - 1;
+    if (velx != 0) {
+        for (int i = 0; i < 25; i++) {
+            for (int j = 0; j < 15; j++) {
+                EventTile colliding_tile = BTiles[i][j];
+                while (!colliding_tile.traversable && checkCollision(x + x_movement, y, w, h, colliding_tile.x, colliding_tile.y, colliding_tile.w, colliding_tile.h)) {
+                    x_movement = approach_zero(x_movement, 0.25);
+                }
+            }
         }
-
-        EventTile colliding_tile_top = BTiles[int(ceil(x + w) / 64)][int(y / 64)];
-        if (!colliding_tile_top.traversable && x + w > colliding_tile_top.x) {
-            x = colliding_tile_top.x - w - 1;
-        }
-    }
-
-    if (velx < 0) {
-        EventTile colliding_tile_top = BTiles[int(floor(x / 64))][int((y + h) / 64)];
-        if (!colliding_tile_top.traversable && x < colliding_tile_top.x + colliding_tile_top.w) {
-            x = colliding_tile_top.x + colliding_tile_top.w + 1;
-        }
-
-        EventTile colliding_tile_bottom = BTiles[int(floor(x / 64))][int(y / 64)];
-        if (!colliding_tile_bottom.traversable && x < colliding_tile_bottom.x + colliding_tile_bottom.w) {
-            x = colliding_tile_bottom.x + colliding_tile_bottom.w + 1;
-        }
+        x += x_movement;
     }
 
     // check collision with ball
     if (!lethal && ballx != 0) {
-        if (abs(x + w / 2 - (ballx + w / 2)) < w && abs(y + h / 2 - (bally + h / 2)) < h) // if ball and player intersect  x + w/2 -= ballx+w/2 - x+w/2
-        {
-            x -= 0.1 * ((ballx + w / 2) - (x + w / 2));
-            y -= 0.1 * ((bally + h / 2) - (y + h / 2));
+        int player_center_x = x + w / 2;
+        int player_center_y = y + h / 2;
+        int ball_center_x = ballx + w / 2;
+        int ball_center_y = bally + h / 2;
+
+        // if ball and player intersect  x + w/2 -= ballx+w/2 - x+w/2
+        if (abs(player_center_x - ball_center_x) < w && abs(player_center_y - ball_center_y) < h) {
+            x -= 0.1 * (ball_center_x - player_center_x);
+            y -= 0.1 * (ball_center_y - player_center_y);
         }
     }
 
     // if moving update cliprect for animation
     // time2nextframe = abs(statictime2nextframe * 1/2 *((velx+.5) / (velcapx+1)
     // +  (vely+.5) / (velcapy+1)));  //+1 to prevent division by 0
-    time2nextframe = statictime2nextframe; // TODO: get dis shit workin
+    time2nextframe = statictime2nextframe; // TODO: get dis workin
 
     if (velx != 0 || vely != 0) {
 
@@ -493,7 +474,7 @@ void Enemy::move(int deltaT, Actor player, EventTile BTiles[][15]) {
                     framecounter = 0;
                 }
 
-                clip_rect.x = 33 * (framecounter % 10) + 1; // 10 tiles per row in tilesheet
+                clip_rect.x = 33 * (framecounter % 10) + 2; // 10 tiles per row in tilesheet
                 if (clip_rect.x == 1) {
                     clip_rect.x = 0;
                 }

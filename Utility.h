@@ -14,3 +14,4 @@ std::string toDottedIP(Uint32 rawIP);
 bool checkCollision(int x, int y, int w, int h, int x2, int y2, int w2, int h2);
 char **separateString(std::string in, int arraySize, const char *sepChar);
 int *charAToIntA(char **in, int size);
+float approach_zero(float num, float step);
