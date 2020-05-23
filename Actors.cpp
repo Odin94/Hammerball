@@ -99,7 +99,7 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally, bool 
     // MS since last frame (30fps -> /30)
     y += vely * (deltaT / 60.f);
 
-    // check map boundaries
+    // check map boundaries (TODO: replace 960 with var)
     if (y + h > 960) {
         y = 960 - h;
     }
@@ -108,32 +108,34 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally, bool 
     }
 
     // check walls
-
+    
     if (vely > 0) {
-        if (!BTiles[int(ceil((x + w) / 64))][int((y + h) / 64)].traversable && y + h > BTiles[int((x + w) / 64)][int(ceil(y / 64 + h))].y) {
-            y = BTiles[int((x + w) / 64)][int(ceil((y + h) / 64))].y - h - 1;
+        EventTile colliding_tile_right = BTiles[int((x + w) / 64)][int(ceil((y + h) / 64))];
+        if (!colliding_tile_right.traversable && y + h > colliding_tile_right.y) {
+            y = colliding_tile_right.y - h - 1;
         }
 
-        if (!BTiles[int(ceil(x / 64))][int((y + h) / 64)].traversable && y + h > BTiles[int(x / 64)][int(ceil(y / 64 + h))].y) {
-            y = BTiles[int(x / 64)][int(ceil((y + h) / 64))].y - h - 1;
+        EventTile colliding_tile_left = BTiles[int(x / 64)][int(ceil((y + h) / 64))];
+        if (!colliding_tile_left.traversable && y + h > colliding_tile_left.y) {
+            y = colliding_tile_left.y - h - 1;
         }
     }
 
     if (vely < 0) {
-        if (!BTiles[int(floor((x + w) / 64))][int(y / 64)].traversable && y < BTiles[int(floor((x + w) / 64))][int(y / 64)].y + BTiles[int(floor((x + w) / 64))][int(y / 64)].h) {
-            y = BTiles[int(floor((x + w) / 64))][int(y / 64)].y +
-                BTiles[int(floor((x + w) / 64))][int(y / 64)].h + 1;
+        EventTile colliding_tile_right = BTiles[int(floor((x + w) / 64))][int(y / 64)];
+        if (!colliding_tile_right.traversable && y < colliding_tile_right.y + colliding_tile_right.h) {
+            y = colliding_tile_right.y + colliding_tile_right.h + 1;
         }
 
-        if (!BTiles[int(floor(x / 64))][int(y / 64)].traversable && y < BTiles[int(floor(x / 64))][int(y / 64)].y + BTiles[int(floor(x / 64))][int(y / 64)].h) {
-            y = BTiles[int(floor(x / 64))][int(y / 64)].y +
-                BTiles[int(floor(x / 64))][int(y / 64)].h + 1;
+        EventTile colliding_tile_left = BTiles[int(floor(x / 64))][int(y / 64)];
+        if (!colliding_tile_left.traversable && y < colliding_tile_left.y + colliding_tile_left.h) {
+            y = colliding_tile_left.y + colliding_tile_left.h + 1;
         }
     }
 
     x += velx * (deltaT / 60.f);
 
-    // check map boundaries
+    // check map boundaries (TODO: replace 1600 with var)
     if (x + w > 1600) {
         x = 1600 - w;
     }
@@ -141,25 +143,28 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally, bool 
         x = 0;
     }
 
+    // TODO: replace 64 with DTS
     if (velx > 0) {
-        if (!BTiles[int(ceil((x + w) / 64))][int((y + h) / 64)].traversable && x + w > BTiles[int(ceil(x + w) / 64)][int((y + h) / 64)].x) {
-            x = BTiles[int(ceil((x + w) / 64))][int((y + h) / 64)].x - w - 1;
+        EventTile colliding_tile_bottom = BTiles[int(ceil(x + w) / 64)][int((y + h) / 64)];
+        if (!colliding_tile_bottom.traversable && x + w > colliding_tile_bottom.x) {
+            x = colliding_tile_bottom.x - w - 1;
         }
 
-        if (!BTiles[int(ceil((x + w) / 64))][int(y / 64)].traversable && x + w > BTiles[int(ceil(x + w) / 64)][int(y / 64)].x) {
-            x = BTiles[int(ceil((x + w) / 64))][int((y) / 64)].x - w - 1;
+        EventTile colliding_tile_top = BTiles[int(ceil(x + w) / 64)][int(y / 64)];
+        if (!colliding_tile_top.traversable && x + w > colliding_tile_top.x) {
+            x = colliding_tile_top.x - w - 1;
         }
     }
 
     if (velx < 0) {
-        if (!BTiles[int(floor(x / 64))][int((y + h) / 64)].traversable && x < BTiles[int(floor(x / 64))][int((y + h) / 64)].x + BTiles[int(floor(x / 64))][int((y + h) / 64)].w) {
-            x = BTiles[int(ceil(x / 64))][int((y + h) / 64)].x +
-                BTiles[int(ceil(x / 64))][int((y + h) / 64)].w;
+        EventTile colliding_tile_top = BTiles[int(floor(x / 64))][int((y + h) / 64)];
+        if (!colliding_tile_top.traversable && x < colliding_tile_top.x + colliding_tile_top.w) {
+            x = colliding_tile_top.x + colliding_tile_top.w + 1;
         }
 
-        if (!BTiles[int(floor(x / 64))][int(y / 64)].traversable && x < BTiles[int(floor(x / 64))][int(y / 64)].x + BTiles[int(floor(x / 64))][int(y / 64)].w) {
-            x = BTiles[int(ceil(x / 64))][int(y / 64)].x +
-                BTiles[int(ceil(x / 64))][int(y / 64)].w;
+        EventTile colliding_tile_bottom = BTiles[int(floor(x / 64))][int(y / 64)];
+        if (!colliding_tile_bottom.traversable && x < colliding_tile_bottom.x + colliding_tile_bottom.w) {
+            x = colliding_tile_bottom.x + colliding_tile_bottom.w + 1;
         }
     }
 
@@ -452,7 +457,6 @@ void Enemy::move(int deltaT, Actor player, EventTile BTiles[][15]) {
     }
 
     x += velx * (deltaT / 60.f);
-    y += vely * (deltaT / 60.f);
 
     // check walls
     if (velx > 0) {
@@ -465,6 +469,8 @@ void Enemy::move(int deltaT, Actor player, EventTile BTiles[][15]) {
             x = BTiles[int(ceil(x / 64))][int((y + h / 2) / 64)].x + BTiles[int(ceil(x / 64))][int((y + h / 2) / 64)].w;
         }
     }
+
+    y += vely * (deltaT / 60.f);
 
     if (vely > 0) {
         if (!BTiles[int(ceil((x + w / 2) / 64))][int((y + h) / 64)].traversable && y + h > BTiles[int((x + w / 2) / 64)][int(ceil(y / 64 + h))].y) {
