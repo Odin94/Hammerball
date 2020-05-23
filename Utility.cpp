@@ -61,7 +61,7 @@ SDL_Texture *load_from_rendered_text(TTF_Font *font, std::string text, SDL_Color
 
 void apply_surface(float drawscale, int x, int y, int w, int h, SDL_Texture *texture, SDL_Renderer *renderer, SDL_Rect *srcRect) // clip is defaulted to NULL!!
 {
-    SDL_Rect destRect = {x * drawscale, y * drawscale, w * drawscale, h * drawscale};
+    SDL_Rect destRect = {(int)(x * drawscale), (int)(y * drawscale), (int)(w * drawscale), (int)(h * drawscale)};
 
     if (srcRect != NULL) {
         srcRect->x *= drawscale;
