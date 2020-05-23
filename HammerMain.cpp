@@ -11,6 +11,7 @@
 #include <ctime>
 #include <cstring>
 #include <iostream>
+#include <array>
 #include "./Utility.h"
 #include "./Actors.h"
 #include "./Timer.h"
@@ -19,7 +20,9 @@
 
 using namespace std;
 
-void initStage();
+bool init_stage();
+bool init_textures();
+bool init_settings();
 
 const int SCREEN_WIDTH = 1600; // 25 tiles
 const int SCREEN_HEIGHT = 960; // 15 tiles
@@ -32,6 +35,9 @@ const int WALL_TILE = 2;
 const int FALLING_TILE = 3;
 
 const int EVENT_TILE = 0;
+
+const string map_path = "Map.txt";
+const string settings_path = "Settings.txt";
 
 const int FRAMES_PER_SECOND = 60;
 
@@ -152,47 +158,13 @@ SDL_Event event;
 bool init() {
     bool success = true;
 
-    // read options
-    fstream settings;
-    settings.open("Settings.txt", ios::in);
-    if (settings.is_open()) {
-        settings.ignore(256, '\n'); // skips till \n character aka next line  (first argument = max characters skipped)
-        getline(settings, desiredScreenWidthString);
-        cout << desiredScreenWidthString;
-        desiredScreenWidth = atoi(desiredScreenWidthString.c_str());
-
-        settings.ignore(256, '\n'); // skips till \n character aka next line  (first argument = max characters skipped)
-        getline(settings, connectionIP);
-
-        string tempplayercount;
-        getline(settings, tempplayercount);
-        playercount = atoi(tempplayercount.c_str());
-        playercount = min(playercount, 4);
-
-        string tempplayernumber;
-        getline(settings, tempplayernumber);
-        playernumber = atoi(tempplayernumber.c_str());
-    } else {
-        cout << "Settings.txt didnt exist and was created, please start again\n";
-        settings.open("Settings.txt", ios::out);
-        settings << "ScreenWidth(Scale always 16:10):"
-                 << "\n"
-                 << "1600"
-                 << "\n"
-                 << "IP:"
-                 << "\n"
-                 << "localhost"
-                 << "\n"
-                 << "2"
-                 << "\n"
-                 << "1"
-                 << "\n";
-        settings.close();
-        exit(0);
+    if (!init_settings()) {
+        cout << "Failed to init settings";
+        success = false;
     }
 
     drawscale = (float)desiredScreenWidth / SCREEN_WIDTH; // modify to accustom to different window sizes/resolutions
-    cout << drawscale;
+    cout << "drawscale: " << drawscale;
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
@@ -206,32 +178,6 @@ bool init() {
 
     // init networkstuff
     SDLNet_Init();
-
-    // read map
-    map.open("Map.txt", ios::in);
-    if (!map.is_open()) {
-        cout << "map.txt didn't exist and was created, please start again\n";
-        map.open("Map.txt", ios::out);
-        for (int i = 0; i < 25; i++) {
-            for (int j = 0; j < 15; j++) {
-                if ((i == 6 || i == 18) && j > 4 && j < 11) {
-                    map << "-1,0," << WALL_TILE << ",0,0,0,1,0,0,0 ";
-                } else if (j == 0 || j == 14 || i == 0 || i == 24) {
-                    map << "-1,0," << WALL_TILE << ",0,0,0,1,0,0,0 ";
-                } else if (j == 12 && i == 12) {
-                    map << "8,1," << FALLING_TILE
-                        << ",9,100,1,1,2000,3000,2500 ";
-                } else {
-                    map << "-1,0," << GROUND_TILE << ",0,0,1,1,0,0,0 ";
-                }
-                if (j == 14) {
-                    map << "\n";
-                }
-            }
-        }
-        map.close();
-        exit(0);
-    }
 
     // server, used for receiving
 
@@ -269,6 +215,112 @@ bool init() {
 
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096); // init mixer
 
+    init_textures();
+
+    player.set(100, 270, DTS, DTS, 0, 0);
+    player2.set(1430, 270, DTS, DTS, 0, 0);
+    player3.set(100, 600, DTS, DTS, 0, 0);
+    player4.set(1430, 600, DTS, DTS, 0, 0);
+
+    ai.set(1430, 270, DTS, DTS, 0, 0);
+
+    ball.set(730, 500, DTS, DTS, 0, 0);
+
+    healthrect.x = 0;
+    healthrect.y = 0;
+    healthrect.w = 105;
+    healthrect.h = 27;
+
+    // Stage1music = Mix_LoadMUS("res/MysteriousSpace.wav");
+
+    if (!init_stage()) {
+        cout << "Failed to init stage";
+        success = false;
+    }
+
+    return success;
+}
+
+void apply_settings(fstream *settings) {
+    settings->ignore(256, '\n'); // skips till \n character aka next line  (first argument = max characters skipped)
+    getline(*settings, desiredScreenWidthString);
+    cout << desiredScreenWidthString;
+    desiredScreenWidth = atoi(desiredScreenWidthString.c_str());
+
+    settings->ignore(256, '\n'); // skips till \n character aka next line  (first argument = max characters skipped)
+    getline(*settings, connectionIP);
+
+    string tempplayercount;
+    getline(*settings, tempplayercount);
+    playercount = atoi(tempplayercount.c_str());
+    playercount = min(playercount, 4);
+
+    string tempplayernumber;
+    getline(*settings, tempplayernumber);
+    playernumber = atoi(tempplayernumber.c_str());
+}
+
+void create_settings(fstream *settings) {
+    settings->open(settings_path, ios::out);
+    *settings << "ScreenWidth(Scale always 16:10):"
+              << "\n"
+              << "1600"
+              << "\n"
+              << "IP:"
+              << "\n"
+              << "localhost"
+              << "\n"
+              << "2"
+              << "\n"
+              << "1"
+              << "\n";
+    settings->close();
+}
+
+bool init_settings() {
+    // read options
+    fstream settings;
+    settings.open(settings_path, ios::in);
+    if (settings.is_open()) {
+        apply_settings(&settings);
+    } else {
+        cout << settings_path << " didnt exist and was created\n";
+        create_settings(&settings);
+        settings.open(settings_path, ios::in);
+        if (settings.is_open()) {
+            apply_settings(&settings);
+        } else {
+            cout << "failed to open settings after creating it.\n";
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void create_map() {
+    map.open(map_path, ios::out);
+    for (int i = 0; i < 25; i++) {
+        for (int j = 0; j < 15; j++) {
+            if ((i == 6 || i == 18) && j > 4 && j < 11) {
+                map << "-1,0," << WALL_TILE << ",0,0,0,1,0,0,0 ";
+            } else if (j == 0 || j == 14 || i == 0 || i == 24) {
+                map << "-1,0," << WALL_TILE << ",0,0,0,1,0,0,0 ";
+            } else if (j == 12 && i == 12) {
+                map << "8,1," << FALLING_TILE
+                    << ",9,100,1,1,2000,3000,2500 ";
+            } else {
+                map << "-1,0," << GROUND_TILE << ",0,0,1,1,0,0,0 ";
+            }
+            if (j == 14) {
+                map << "\n";
+            }
+        }
+    }
+    map.close();
+}
+
+bool init_textures() {
     ATile_ground = load_texture("res/ground.png", renderer);
     BTile_Wall = load_texture("res/Wall.png", renderer);
     FallingTile = load_texture("res/falltile.png", renderer);
@@ -304,32 +356,25 @@ bool init() {
     textures[1] = BTile_Spikes;
     textures[2] = BTile_Wall;
     textures[3] = FallingTile;
-    // score = TTF_RenderUTF8_Shaded(font, toString(travelled).c_str(), textColor, bgcolor);
 
-    player.set(100, 270, DTS, DTS, 0, 0);
-    player2.set(1430, 270, DTS, DTS, 0, 0);
-    player3.set(100, 600, DTS, DTS, 0, 0);
-    player4.set(1430, 600, DTS, DTS, 0, 0);
-
-    ai.set(1430, 270, DTS, DTS, 0, 0);
-
-    ball.set(730, 500, DTS, DTS, 0, 0);
-
-    healthrect.x = 0;
-    healthrect.y = 0;
-    healthrect.w = 105;
-    healthrect.h = 27;
-
-    // Stage1music = Mix_LoadMUS("res/MysteriousSpace.wav");
-
-    initStage();
-
-    return success;
+    return true;
 }
 
 // setE: xywh, dmgfr, dmgfrdmg, img, maxframes, time2nextframe, traversable,
 // active, minTime, maxTime, TimeTillReset
-void initStage() {
+bool init_stage() {
+    // read map
+    map.open(map_path, ios::in);
+    if (!map.is_open()) {
+        cout << map_path << " didn't exist and was created\n";
+        create_map();
+        map.open(map_path, ios::in);
+        if (!map.is_open()) {
+            cout << "failed to open map after creating it.\n";
+            return false;
+        }
+    }
+
     srand((unsigned)time(0));
     int rnd;
 
@@ -369,6 +414,8 @@ void initStage() {
     ATiles[11][11].setE(11 * DTS, 11 * DTS, DTS, DTS, 8, 1, FALLING_TILE, 9, 250, true, true, 2000, 3000, 2500);
     ATiles[11][11].generateTime();
     ATiles[11][11].clip_rect.x = 0;
+
+    return true;
 }
 
 void draw_multiplayer_title() {
