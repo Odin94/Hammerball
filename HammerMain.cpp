@@ -751,8 +751,7 @@ void update_local_player(Uint32 delta) {
             player.inBallRange = false;
         }
 
-        if (BTiles[(player.x + player.w / 2) / DTS][(player.y + player.h / 2) / DTS].damage > 0 ||
-            ATiles[(player.x + player.w / 2) / DTS][(player.y + player.h / 2) / DTS].damage > 0) {
+        if (BTiles[(player.x + player.w / 2) / DTS][(player.y + player.h / 2) / DTS].damage > 0 || ATiles[(player.x + player.w / 2) / DTS][(player.y + player.h / 2) / DTS].damage > 0) {
             player.alive = false;
         }
     }

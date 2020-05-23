@@ -228,15 +228,11 @@ void Ball::move(int deltaT, EventTile Btiles[][15]) {
     bool didcollide = false;
     for (int i = 0; i < 25; i++) {
         for (int j = 0; j < 15; j++) {
-            if (!Btiles[i][j].traversable && checkCollision(x + velx * (deltaT / 60.f), y, h, w,
-                                                            Btiles[i][j].x, Btiles[i][j].y, Btiles[i][j].w,
-                                                            Btiles[i][j].h)) {
+            if (!Btiles[i][j].traversable && checkCollision(x + velx * (deltaT / 60.f), y, h, w, Btiles[i][j].x, Btiles[i][j].y, Btiles[i][j].w, Btiles[i][j].h)) {
                 velx = -velx;
                 didcollide = true;
             }
-            if (!Btiles[i][j].traversable && checkCollision(x, y + vely * (deltaT / 60.f), h, w,
-                                                            Btiles[i][j].x, Btiles[i][j].y, Btiles[i][j].w,
-                                                            Btiles[i][j].h)) {
+            if (!Btiles[i][j].traversable && checkCollision(x, y + vely * (deltaT / 60.f), h, w, Btiles[i][j].x, Btiles[i][j].y, Btiles[i][j].w, Btiles[i][j].h)) {
                 vely = -vely;
                 didcollide = true;
             }
