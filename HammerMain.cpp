@@ -1030,144 +1030,157 @@ void process_input() {
     }
 }
 
+void setup_multiplayer() {
+    if (isHost) {
+        TCPClient = SDLNet_TCP_Accept(TCPServer);
+        if (TCPClient) {
+            if (playercount > 2) {
+                while (TCPClient2 == NULL) {
+                    TCPClient2 = SDLNet_TCP_Accept(TCPServer);
+                }
+                if (playercount > 3) {
+                    while (TCPClient3 == NULL) {
+                        TCPClient3 = SDLNet_TCP_Accept(TCPServer);
+                    }
+                }
+            }
+            string TCPmessage = "H" + StrInName.str;
+            SDLNet_TCP_Send(TCPClient, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
+            SDLNet_TCP_Recv(TCPClient, TCPBufferClt, 16);
+            name2 = load_from_rendered_text(fontSmall, TCPBufferClt, textColor, renderer);
+
+            if (playercount > 2) {
+                SDLNet_TCP_Send(TCPClient2, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
+                if (playercount > 3) {
+                    SDLNet_TCP_Send(TCPClient3, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
+                }
+            }
+
+            TCPConnectionDone = true;
+            inTitle = false;
+        }
+    } else {
+        if ((TCPClient = SDLNet_TCP_Open(&address)) != NULL) {
+            SDLNet_TCP_Recv(TCPClient, TCPBufferClt, 100);
+            SDLNet_TCP_Send(TCPClient, StrInName.str.c_str(), strlen(StrInName.str.c_str()) + 1);
+            if (TCPBufferClt[0] == 'H') {
+                TCPConnectionDone = true;
+                inTitle = false;
+                char name2array[16];
+                for (int i = 0; i < 16; i++) {
+                    name2array[i] = TCPBufferClt[i + 1];
+                }
+                name2 = load_from_rendered_text(fontSmall, name2array, textColor, renderer);
+            }
+        } else {
+            fprintf(stderr, "SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+        }
+    }
+}
+
+void process_title_input() {
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            inTitle = false;
+            running = false;
+        }
+
+        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+            SDL_Rect new_viewport = {0, 0, event.window.data1, event.window.data2};
+            SDL_RenderSetLogicalSize(renderer, event.window.data1, event.window.data2);
+        }
+
+        if (event.type == SDL_KEYDOWN || event.type == SDL_TEXTINPUT) {
+            if (!inputdone) {
+                if (inputcounter == 0) {
+                    StrIn.handle_input(event);
+                    if (StrIn.rerenderpls) {
+                        text = load_from_rendered_text(font, StrIn.str, textColor, renderer);
+                        StrIn.rerenderpls = false;
+                    }
+                } else if (inputcounter == 1) {
+                    StrInName.handle_input(event);
+                    if (StrInName.rerenderpls) {
+                        name = load_from_rendered_text(font, StrInName.str, textColor, renderer);
+                        StrInName.rerenderpls = false;
+                    }
+                }
+
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
+                    SDL_StopTextInput();
+                    running = false;
+                    inTitle = false;
+                }
+                if (event.key.keysym.sym == SDLK_RETURN) {
+                    if (inputcounter == 0) {
+                        inputcounter++;
+                    } else if (inputcounter == 1) {
+                        if (StrIn.str.length() > 0) {
+                            SDLNet_ResolveHost(&address, StrIn.str.c_str(), 8134);
+                            connectionIP = StrIn.str;
+                            if (StrIn.str == "local") {
+                                localmultiplayer = true;
+                            }
+                        }
+                        name = load_from_rendered_text(fontSmall, StrInName.str, textColor, renderer);
+                        inputdone = true;
+                        SDL_StopTextInput();
+                    }
+                }
+                break;
+            }
+            switch (event.key.keysym.sym) {
+            case SDLK_RETURN:
+                inTitle = false;
+                UpgradeSpawner.start();
+                break;
+            case SDLK_ESCAPE:
+                if (multiplayer) {
+                    multiplayer = false;
+                    isHost = true;
+                    SDLNet_UDP_Close(serverSocket);
+                } else {
+                    running = false;
+                    inTitle = false;
+                }
+                break;
+
+            case SDLK_c:
+                SDL_SetWindowFullscreen(window, SDL_FALSE);
+                break;
+            case SDLK_v:
+                SDL_SetWindowFullscreen(window, SDL_TRUE);
+                break;
+
+            case SDLK_h:
+                isHost = true;
+                multiplayer = true;
+                break;
+            case SDLK_j:
+                isHost = false;
+                multiplayer = true;
+                draw();
+                break;
+            }
+        }
+    }
+}
+
+void update_title() {
+    process_title_input();
+
+    if (multiplayer && !TCPConnectionDone) {
+        setup_multiplayer();
+    }
+
+    draw();
+}
+
 void run() {
     SDL_StartTextInput();
 
     while (inTitle == true) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                inTitle = false;
-                running = false;
-            }
-
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-                SDL_Rect new_viewport = {0, 0, event.window.data1, event.window.data2};
-                SDL_RenderSetLogicalSize(renderer, event.window.data1, event.window.data2);
-            }
-
-            if (event.type == SDL_KEYDOWN || event.type == SDL_TEXTINPUT) {
-                if (!inputdone) {
-                    if (inputcounter == 0) {
-                        StrIn.handle_input(event);
-                        if (StrIn.rerenderpls) {
-                            text = load_from_rendered_text(font, StrIn.str, textColor, renderer);
-                            StrIn.rerenderpls = false;
-                        }
-                    } else if (inputcounter == 1) {
-                        StrInName.handle_input(event);
-                        if (StrInName.rerenderpls) {
-                            name = load_from_rendered_text(font, StrInName.str, textColor, renderer);
-                            StrInName.rerenderpls = false;
-                        }
-                    }
-
-                    if (event.key.keysym.sym == SDLK_ESCAPE) {
-                        SDL_StopTextInput();
-                        running = false;
-                        inTitle = false;
-                    }
-                    if (event.key.keysym.sym == SDLK_RETURN) {
-                        if (inputcounter == 0) {
-                            inputcounter++;
-                        } else if (inputcounter == 1) {
-                            if (StrIn.str.length() > 0) {
-                                SDLNet_ResolveHost(&address, StrIn.str.c_str(), 8134);
-                                connectionIP = StrIn.str;
-                                if (StrIn.str == "local") {
-                                    localmultiplayer = true;
-                                }
-                            }
-                            name = load_from_rendered_text(fontSmall, StrInName.str, textColor, renderer);
-                            inputdone = true;
-                            SDL_StopTextInput();
-                        }
-                    }
-                    break;
-                }
-                switch (event.key.keysym.sym) {
-                case SDLK_RETURN:
-                    inTitle = false;
-                    UpgradeSpawner.start();
-                    break;
-                case SDLK_ESCAPE:
-                    if (multiplayer) {
-                        multiplayer = false;
-                        isHost = true;
-                        SDLNet_UDP_Close(serverSocket);
-                    } else {
-                        running = false;
-                        inTitle = false;
-                    }
-                    break;
-
-                case SDLK_c:
-                    SDL_SetWindowFullscreen(window, SDL_FALSE);
-                    break;
-                case SDLK_v:
-                    SDL_SetWindowFullscreen(window, SDL_TRUE);
-                    break;
-
-                case SDLK_h:
-                    isHost = true;
-                    multiplayer = true;
-                    break;
-                case SDLK_j:
-                    isHost = false;
-                    multiplayer = true;
-                    draw();
-                    break;
-                }
-            }
-        }
-
-        if (multiplayer && !TCPConnectionDone) {
-            if (isHost) {
-                TCPClient = SDLNet_TCP_Accept(TCPServer);
-                if (TCPClient) {
-                    if (playercount > 2) {
-                        while (TCPClient2 == NULL) {
-                            TCPClient2 = SDLNet_TCP_Accept(TCPServer);
-                        }
-                        if (playercount > 3) {
-                            while (TCPClient3 == NULL) {
-                                TCPClient3 = SDLNet_TCP_Accept(TCPServer);
-                            }
-                        }
-                    }
-                    string TCPmessage = "H" + StrInName.str;
-                    SDLNet_TCP_Send(TCPClient, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
-                    SDLNet_TCP_Recv(TCPClient, TCPBufferClt, 16);
-                    name2 = load_from_rendered_text(fontSmall, TCPBufferClt, textColor, renderer);
-
-                    if (playercount > 2) {
-                        SDLNet_TCP_Send(TCPClient2, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
-                        if (playercount > 3) {
-                            SDLNet_TCP_Send(TCPClient3, TCPmessage.c_str(), strlen(TCPmessage.c_str()) + 1);
-                        }
-                    }
-
-                    TCPConnectionDone = true;
-                    inTitle = false;
-                }
-            } else {
-                if ((TCPClient = SDLNet_TCP_Open(&address)) != NULL) {
-                    SDLNet_TCP_Recv(TCPClient, TCPBufferClt, 100);
-                    SDLNet_TCP_Send(TCPClient, StrInName.str.c_str(), strlen(StrInName.str.c_str()) + 1);
-                    if (TCPBufferClt[0] == 'H') {
-                        TCPConnectionDone = true;
-                        inTitle = false;
-                        char name2array[16];
-                        for (int i = 0; i < 16; i++) {
-                            name2array[i] = TCPBufferClt[i + 1];
-                        }
-                        name2 = load_from_rendered_text(fontSmall, name2array, textColor, renderer);
-                    }
-                } else {
-                    fprintf(stderr, "SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-                }
-            }
-        }
-        draw();
+        update_title();
     }
 
     Timer delta;
