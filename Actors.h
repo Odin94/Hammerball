@@ -26,7 +26,7 @@ class Actor {
     int invulcounter;
     bool invuln;
 
-    bool alive;
+    bool alive = true;
 
     bool inBallRange;
 
@@ -46,6 +46,8 @@ class Actor {
     Actor();
 
     void set(int x, int y, int w, int h, int velx, int vely, SDL_Texture *texture = nullptr);
+
+    void draw(float drawscale, SDL_Renderer *renderer, bool ignore_clip_rect = false);
 
     void move(int time, EventTile BTiles[][15], int ballx = 0, int bally = 0, bool lethal = false);
 
@@ -67,6 +69,8 @@ class Player : public Actor {
 
     Player();
 
+    void draw(float drawscale, SDL_Renderer *renderer);
+
     void set(int x, int y, int w, int h, int velx, int vely, SDL_Texture *alive_texture = nullptr, SDL_Texture *dead_texture = nullptr);
 };
 
@@ -79,6 +83,8 @@ class Ball : public Actor {
     SDL_Texture *deadly_texture;
 
     Ball();
+
+    void draw(float drawscale, SDL_Renderer *renderer);
 
     void move(int deltaT, EventTile Btiles[][15]);
 

@@ -55,12 +55,10 @@ SDL_Texture *load_from_rendered_text(TTF_Font *font, std::string text, SDL_Color
         SDL_FreeSurface(textSurface);
     }
 
-    //Return success
     return texture;
 }
 
-void apply_surface(float drawscale, int x, int y, int w, int h, SDL_Texture *texture, SDL_Renderer *renderer, SDL_Rect *srcRect) // clip is defaulted to NULL!!
-{
+void apply_surface(float drawscale, int x, int y, int w, int h, SDL_Texture *texture, SDL_Renderer *renderer, SDL_Rect *srcRect) {
     SDL_Rect destRect = {(int)(x * drawscale), (int)(y * drawscale), (int)(w * drawscale), (int)(h * drawscale)};
 
     if (srcRect != NULL) {
@@ -68,10 +66,7 @@ void apply_surface(float drawscale, int x, int y, int w, int h, SDL_Texture *tex
         srcRect->y *= drawscale;
         srcRect->w *= drawscale;
         srcRect->h *= drawscale;
-
-        // printf("Rendering: clip x %d, y %d, w %d, h %d \n", clip->x, clip->y, clip->w, clip->h);
     }
-    // printf("Rendering: offset x %d, y %d, w %d, h %d \n\n", offset.x, offset.y, offset.w, offset.h);
 
     SDL_RenderCopy(renderer, texture, srcRect, &destRect);
 }

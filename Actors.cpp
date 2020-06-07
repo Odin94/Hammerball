@@ -36,6 +36,15 @@ void Actor::set(int x, int y, int w, int h, int velx = 0, int vely = 0, SDL_Text
     inBallRange = false;
 }
 
+void Actor::draw(float drawscale, SDL_Renderer *renderer, bool ignore_clip_rect) {
+    if (ignore_clip_rect) {
+        apply_surface(drawscale, x, y, w, h, texture, renderer);
+
+    } else {
+        apply_surface(drawscale, x, y, w, h, texture, renderer, &clip_rect);
+    }
+}
+
 void Actor::takeDamage(int dmg, Actor source) {
     health -= dmg;
 
@@ -174,9 +183,7 @@ void Actor::move(int deltaT, EventTile BTiles[][15], int ballx, int bally, bool 
                 framecounter = 0;
             }
 
-            clip_rect.y =
-                64 * (framecounter % (maxframes)) +
-                framecounter; // 4 tiles per row in tilesheet //0, 65, 130,
+            clip_rect.y = 64 * (framecounter % (maxframes)) + framecounter; // 4 tiles per row in tilesheet //0, 65, 130,
             if (clip_rect.y < 20) {
                 clip_rect.y = 0;
             }
@@ -213,6 +220,16 @@ void Player::set(int x, int y, int w, int h, int velx, int vely, SDL_Texture *al
         this->dead_texture = dead_texture;
 }
 
+void Player::draw(float drawscale, SDL_Renderer *renderer) {
+    if (this->alive) {
+        this->texture = alive_texture;
+        Actor::draw(drawscale, renderer);
+    } else {
+        this->texture = dead_texture;
+        Actor::draw(drawscale, renderer, true);
+    }
+}
+
 Upgrade::Upgrade() { active = false; }
 
 Ball::Ball() {
@@ -227,6 +244,16 @@ void Ball::set(int x, int y, int w, int h, int velx, int vely, SDL_Texture *dorm
         this->dormant_texture = dormant_texture;
     if (deadly_texture != nullptr)
         this->deadly_texture = deadly_texture;
+}
+
+void Ball::draw(float drawscale, SDL_Renderer *renderer) {
+    if (this->lethal) {
+        this->texture = deadly_texture;
+    } else {
+        this->texture = dormant_texture;
+    }
+
+    Actor::draw(drawscale, renderer);
 }
 
 void Ball::move(int deltaT, EventTile Btiles[][15]) {

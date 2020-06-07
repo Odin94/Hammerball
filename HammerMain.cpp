@@ -501,11 +501,7 @@ void draw_ai() {
 }
 
 void draw_local_player() {
-    if (player.alive) {
-        apply_surface(drawscale, player.x, player.y, DTS, DTS, PlayerSprite, renderer, &player.clip_rect);
-    } else {
-        apply_surface(drawscale, player.x, player.y, DTS, DTS, PlayerDead, renderer);
-    }
+    player.draw(drawscale, renderer);
 }
 
 void draw_multiplayer_players() {
