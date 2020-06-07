@@ -3,6 +3,7 @@
 #define Actor_H
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include "Timer.h"
 #include "Tile.h"
 
@@ -32,6 +33,7 @@ class Actor {
     int damage;
 
     SDL_Rect clip_rect;
+    SDL_Texture *texture;
 
     int statictime2nextframe;
     int time2nextframe; // dynamic; depends on movementspeed / speedcap
@@ -43,7 +45,7 @@ class Actor {
 
     Actor();
 
-    void set(int x, int y, int w, int h, int velx, int vely);
+    void set(int x, int y, int w, int h, int velx, int vely, SDL_Texture *texture = nullptr);
 
     void move(int time, EventTile BTiles[][15], int ballx = 0, int bally = 0, bool lethal = false);
 
@@ -60,9 +62,12 @@ class Player : public Actor {
     int speedupcap;
     int powerupcap;
 
+    SDL_Texture *alive_texture;
+    SDL_Texture *dead_texture;
+
     Player();
 
-    void shoot();
+    void set(int x, int y, int w, int h, int velx, int vely, SDL_Texture *alive_texture = nullptr, SDL_Texture *dead_texture = nullptr);
 };
 
 class Ball : public Actor {
@@ -70,11 +75,16 @@ class Ball : public Actor {
     bool lethal;
     float time1;
 
+    SDL_Texture *dormant_texture;
+    SDL_Texture *deadly_texture;
+
     Ball();
 
     void move(int deltaT, EventTile Btiles[][15]);
 
-    void getHit(Player& source);
+    void getHit(Player &source);
+
+    void set(int x, int y, int w, int h, int velx, int vely, SDL_Texture *dormant_texture = nullptr, SDL_Texture *deadly_texture = nullptr);
 };
 
 class Upgrade : public Actor {

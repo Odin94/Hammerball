@@ -105,28 +105,32 @@ SDL_Texture *textures[10];
 
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
+
 SDL_Texture *TitleScreen = NULL;
 SDL_Texture *HostingScreen = NULL;
 SDL_Texture *SettingsBG = NULL;
 SDL_Texture *ClientScreen = NULL;
+
 SDL_Texture *selection = NULL;
+
 SDL_Texture *ATile_ground = NULL;
 SDL_Texture *BTile_Spikes = NULL;
 SDL_Texture *BTile_Wall = NULL;
-SDL_Texture *PlayerSprite = NULL;
-SDL_Texture *PlayerDead = NULL;
+
 SDL_Texture *SpeedUp = NULL;
 SDL_Texture *PowerUp = NULL;
-SDL_Texture *Enemy_Knife = NULL;
+
 SDL_Texture *HealthBar = NULL;
 SDL_Texture *HealthBarFrame = NULL;
-SDL_Texture *Bullet = NULL;
 SDL_Texture *FallingTile = NULL;
 
 SDL_Texture *Borders = NULL;
 
 SDL_Texture *TEST = NULL;
 SDL_Texture *TEST2 = NULL;
+
+SDL_Texture *PlayerSprite = NULL;
+SDL_Texture *PlayerDead = NULL;
 
 SDL_Texture *BallLethal = NULL;
 SDL_Texture *BallNonLethal = NULL;
@@ -220,14 +224,14 @@ bool init() {
 
     init_textures();
 
-    player.set(100, 270, DTS, DTS, 0, 0);
-    player2.set(1430, 270, DTS, DTS, 0, 0);
-    player3.set(100, 600, DTS, DTS, 0, 0);
-    player4.set(1430, 600, DTS, DTS, 0, 0);
+    player.set(100, 270, DTS, DTS, 0, 0, PlayerSprite, PlayerDead);
+    player2.set(1430, 270, DTS, DTS, 0, 0, PlayerSprite, PlayerDead);
+    player3.set(100, 600, DTS, DTS, 0, 0, PlayerSprite, PlayerDead);
+    player4.set(1430, 600, DTS, DTS, 0, 0, PlayerSprite, PlayerDead);
 
-    ai.set(1430, 270, DTS, DTS, 0, 0);
+    ai.set(1430, 270, DTS, DTS, 0, 0, PlayerSprite, PlayerDead);
 
-    ball.set(730, 500, DTS, DTS, 0, 0);
+    ball.set(730, 500, DTS, DTS, 0, 0, BallNonLethal, BallLethal);
 
     healthrect.x = 0;
     healthrect.y = 0;
@@ -730,8 +734,10 @@ void update_upgrade() {
 
         if (typerand == 0) {
             upgrade.type = 's';
+            upgrade.texture = SpeedUp;
         } else {
             upgrade.type = 'p';
+            upgrade.texture = PowerUp;
         }
 
         upgrade.active = true;

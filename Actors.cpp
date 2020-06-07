@@ -8,7 +8,9 @@ Actor::Actor() {
     alive = true;
 }
 
-void Actor::set(int x, int y, int w, int h, int velx = 0, int vely = 0) {
+void Actor::set(int x, int y, int w, int h, int velx = 0, int vely = 0, SDL_Texture *texture) {
+    if (texture != nullptr)
+        this->texture = texture;
 
     this->x = x;
     this->y = y;
@@ -202,11 +204,29 @@ Player::Player() {
     powerupcap = 5;
 }
 
+void Player::set(int x, int y, int w, int h, int velx, int vely, SDL_Texture *alive_texture, SDL_Texture *dead_texture) {
+    Actor::set(x, y, w, h, velx, vely, alive_texture);
+
+    if (alive_texture != nullptr)
+        this->alive_texture = alive_texture;
+    if (dead_texture != nullptr)
+        this->dead_texture = dead_texture;
+}
+
 Upgrade::Upgrade() { active = false; }
 
 Ball::Ball() {
     lethal = false;
     time1 = 0;
+}
+
+void Ball::set(int x, int y, int w, int h, int velx, int vely, SDL_Texture *dormant_texture, SDL_Texture *deadly_texture) {
+    Actor::set(x, y, w, h, velx, vely, dormant_texture);
+
+    if (dormant_texture != nullptr)
+        this->dormant_texture = dormant_texture;
+    if (deadly_texture != nullptr)
+        this->deadly_texture = deadly_texture;
 }
 
 void Ball::move(int deltaT, EventTile Btiles[][15]) {
@@ -295,7 +315,7 @@ void Ball::move(int deltaT, EventTile Btiles[][15]) {
     }
 }
 
-void Ball::getHit(Player& source) {
+void Ball::getHit(Player &source) {
     float addedvelx = x - source.x;
     float addedvely = y - source.y;
 
