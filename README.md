@@ -5,6 +5,8 @@ I've recently discovered the code on my old hard drive and am now looking to cle
 
 
 ## Dependencies
+These instructions are made for building on Windows 10. They likely work on other Windows versions as well.
+
 Unpack the 64bit version (has to match your mingw installation) of the following dependencies into `C:\mingw_dev_lib`
 
 * SDL 2 (http://libsdl.org/download-2.0.php SDL2-devel-2.0.12-mingw.tar.gz)
@@ -13,6 +15,7 @@ Unpack the 64bit version (has to match your mingw installation) of the following
 * SDL_ttf (https://www.libsdl.org/projects/SDL_ttf/ SDL2_ttf-devel-2.0.15-mingw.tar.gz)
 * SDL_mixer(https://www.libsdl.org/projects/SDL_mixer/ SDL2_mixer-devel-2.0.4-mingw.tar.gz)
 
+Install `mingw` and `make`, run `make` in the base folder of this repository to build.
 
 ## Planned Features
 * Visual and/or audio cue when ball is in hitting range
