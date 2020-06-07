@@ -9,14 +9,10 @@
 class Actor {
 
   public:
-    // rect
     int x;
     int y;
     int w;
     int h;
-
-    int powerup; // not needed, but without this the ball.gethit function will
-                 // cry   (le uber poor design face)
 
     float velcapx;
     float velcapy;
@@ -49,8 +45,7 @@ class Actor {
 
     void set(int x, int y, int w, int h, int velx, int vely);
 
-    void move(int time, EventTile BTiles[][15], int ballx = 0, int bally = 0,
-              bool lethal = false);
+    void move(int time, EventTile BTiles[][15], int ballx = 0, int bally = 0, bool lethal = false);
 
     void invul(int invultime);
 
@@ -79,7 +74,7 @@ class Ball : public Actor {
 
     void move(int deltaT, EventTile Btiles[][15]);
 
-    void getHit(Actor source);
+    void getHit(Player& source);
 };
 
 class Upgrade : public Actor {
@@ -90,7 +85,7 @@ class Upgrade : public Actor {
     Upgrade();
 };
 
-class AI : public Actor {
+class AI : public Player {
   public:
     Timer hitspampreventor;
 
@@ -109,8 +104,7 @@ class Enemy : public Actor {
 
     Enemy();
 
-    void setEnemy(int x, int y, int maxframes, int time2nextframe,
-                  int dmg = 10);
+    void setEnemy(int x, int y, int maxframes, int time2nextframe, int dmg = 10);
 
     void move(int time, Actor player, EventTile BTiles[][15]);
 

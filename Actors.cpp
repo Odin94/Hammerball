@@ -6,7 +6,6 @@
 
 Actor::Actor() {
     alive = true;
-    powerup = 0;
 }
 
 void Actor::set(int x, int y, int w, int h, int velx = 0, int vely = 0) {
@@ -296,7 +295,7 @@ void Ball::move(int deltaT, EventTile Btiles[][15]) {
     }
 }
 
-void Ball::getHit(Actor source) {
+void Ball::getHit(Player& source) {
     float addedvelx = x - source.x;
     float addedvely = y - source.y;
 
