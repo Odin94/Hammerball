@@ -98,6 +98,8 @@ class Upgrade : public Actor {
     char type;
     bool active;
 
+    void draw(float drawscale, SDL_Renderer *renderer);
+
     Upgrade();
 };
 

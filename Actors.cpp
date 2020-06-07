@@ -232,6 +232,11 @@ void Player::draw(float drawscale, SDL_Renderer *renderer) {
 
 Upgrade::Upgrade() { active = false; }
 
+void Upgrade::draw(float drawscale, SDL_Renderer *renderer) {
+    if (this->active)
+        Actor::draw(drawscale, renderer);
+}
+
 Ball::Ball() {
     lethal = false;
     time1 = 0;
@@ -253,7 +258,7 @@ void Ball::draw(float drawscale, SDL_Renderer *renderer) {
         this->texture = dormant_texture;
     }
 
-    Actor::draw(drawscale, renderer);
+    Actor::draw(drawscale, renderer, true);
 }
 
 void Ball::move(int deltaT, EventTile Btiles[][15]) {

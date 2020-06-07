@@ -479,55 +479,6 @@ void draw_tiles() {
     }
 }
 
-void draw_upgrades() {
-    if (upgrade.active) {
-        if (upgrade.type == 's') {
-            apply_surface(drawscale, upgrade.x, upgrade.y, DTS, DTS, SpeedUp, renderer);
-        }
-        if (upgrade.type == 'p') {
-            apply_surface(drawscale, upgrade.x, upgrade.y, DTS, DTS, PowerUp, renderer);
-        }
-    }
-}
-
-void draw_ai() {
-    if (!multiplayer && !localmultiplayer) {
-        if (ai.alive) {
-            apply_surface(drawscale, ai.x, ai.y, DTS, DTS, PlayerSprite, renderer, &ai.clip_rect);
-        } else {
-            apply_surface(drawscale, ai.x, ai.y, DTS, DTS, PlayerDead, renderer);
-        }
-    }
-}
-
-void draw_local_player() {
-    player.draw(drawscale, renderer);
-}
-
-void draw_multiplayer_players() {
-    if (multiplayer || localmultiplayer) {
-        if (player2.alive) {
-            apply_surface(drawscale, player2.x, player2.y, DTS, DTS, PlayerSprite, renderer, &player2.clip_rect);
-        } else {
-            apply_surface(drawscale, player2.x, player2.y, DTS, DTS, PlayerDead, renderer);
-        }
-        if (playercount > 2 && player3.alive) {
-            apply_surface(drawscale, player3.x, player3.y, DTS, DTS, PlayerSprite, renderer, &player3.clip_rect);
-            if (playercount > 3 && player4.alive) {
-                apply_surface(drawscale, player4.x, player4.y, DTS, DTS, PlayerSprite, renderer, &player4.clip_rect);
-            }
-        }
-    }
-}
-
-void draw_ball() {
-    if (ball.lethal) {
-        apply_surface(drawscale, ball.x, ball.y, DTS, DTS, BallLethal, renderer);
-    } else {
-        apply_surface(drawscale, ball.x, ball.y, DTS, DTS, BallNonLethal, renderer);
-    }
-}
-
 void draw_ui() {
     int nameW, nameH;
     SDL_QueryTexture(name, NULL, NULL, &nameW, &nameH);
@@ -543,11 +494,26 @@ void draw_ui() {
 
 void draw_active_game() {
     draw_tiles();
-    draw_upgrades();
-    draw_ai();
-    draw_local_player();
-    draw_multiplayer_players();
-    draw_ball();
+
+    upgrade.draw(drawscale, renderer);
+
+    if (!multiplayer && !localmultiplayer) {
+        ai.draw(drawscale, renderer);
+    }
+
+    player.draw(drawscale, renderer);
+
+    if (multiplayer || localmultiplayer) {
+        player2.draw(drawscale, renderer);
+        if (playercount > 2 && player3.alive) {
+            player3.draw(drawscale, renderer);
+            if (playercount > 3 && player4.alive) {
+                player4.draw(drawscale, renderer);
+            }
+        }
+    }
+    ball.draw(drawscale, renderer);
+
     draw_ui();
 }
 
