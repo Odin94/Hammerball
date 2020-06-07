@@ -61,13 +61,13 @@ IPaddress Client2Adr, Client3Adr, Client4Adr;
 char TCPBufferClt[100];
 IPaddress TCPip;
 bool TCPConnectionDone = false;
-int playercount;      // amount of players
+int playercount;
 int playernumber = 1; // your number (host is 1)
 
 UDPsocket clientSocket;
 UDPsocket serverSocket;
 UDPpacket *sendPac;
-UDPpacket *recPac; // really wanna call one of the tuPac.. :S
+UDPpacket *recPac;
 
 char hitball = '0';
 Timer hitStackPreventor;
@@ -80,8 +80,7 @@ int desiredScreenWidth;
 IPaddress address;
 IPaddress UDPaddress;
 
-bool isHost = true; // true if you dont play MP - used to check whether this
-                    // entity has to calculate game logic
+bool isHost = true;
 bool multiplayer = false;
 
 bool localmultiplayer = false;
@@ -92,6 +91,7 @@ int deltaT; // time since last frame
 
 Timer clickspamprevent0r;
 Timer clickspamprevent0r2;
+int ball_hit_cooldown = 500;
 
 Timer UpgradeSpawner;
 Upgrade upgrade;
@@ -165,7 +165,7 @@ bool init() {
         success = false;
     }
 
-    drawscale = (float)desiredScreenWidth / SCREEN_WIDTH; // modify to accustom to different window sizes/resolutions
+    drawscale = (float)desiredScreenWidth / SCREEN_WIDTH;
     cout << "drawscale: " << drawscale;
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -178,11 +178,9 @@ bool init() {
         success = false;
     }
 
-    // init networkstuff
     SDLNet_Init();
 
     // server, used for receiving
-
     recPac = SDLNet_AllocPacket(512);
     sendPac = SDLNet_AllocPacket(512);
 
@@ -191,8 +189,6 @@ bool init() {
 
     SDLNet_ResolveHost(&TCPip, NULL, 8134);
     SDLNet_ResolveHost(&address, connectionIP.c_str(), 8134); // address, hostIPString, (server's)port
-    // TCPServer
-    // Resolving the host using NULL make network interface to listen
     TCPServer = SDLNet_TCP_Open(&TCPip);
 
     font = TTF_OpenFont("res/Demonized.ttf", 28);
@@ -220,7 +216,7 @@ bool init() {
         success = false;
     }
 
-    Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096); // init mixer
+    Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
 
     init_textures();
 
@@ -249,12 +245,12 @@ bool init() {
 }
 
 void apply_settings(fstream *settings) {
-    settings->ignore(256, '\n'); // skips till \n character aka next line  (first argument = max characters skipped)
+    settings->ignore(256, '\n');
     getline(*settings, desiredScreenWidthString);
     cout << desiredScreenWidthString;
     desiredScreenWidth = atoi(desiredScreenWidthString.c_str());
 
-    settings->ignore(256, '\n'); // skips till \n character aka next line  (first argument = max characters skipped)
+    settings->ignore(256, '\n');
     getline(*settings, connectionIP);
 
     string tempplayercount;
@@ -285,7 +281,6 @@ void create_settings(fstream *settings) {
 }
 
 bool init_settings() {
-    // read options
     fstream settings;
     settings.open(settings_path, ios::in);
     if (settings.is_open()) {
@@ -367,10 +362,7 @@ bool init_textures() {
     return true;
 }
 
-// setE: xywh, dmgfr, dmgfrdmg, img, maxframes, time2nextframe, traversable,
-// active, minTime, maxTime, TimeTillReset
 bool init_stage() {
-    // read map
     map.open(map_path, ios::in);
     if (!map.is_open()) {
         cout << map_path << " didn't exist and was created\n";
@@ -560,7 +552,6 @@ void draw_active_game() {
 }
 
 void draw() {
-    //Clear screen
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
 
@@ -570,31 +561,11 @@ void draw() {
         draw_active_game();
     }
 
-    //Update screen
     SDL_RenderPresent(renderer);
 }
 
-void handleMP() // TCP introduction makes both sides crash when moving the
-                // window (and also randomly when connected to a different PC,
-                // recv failure?)
-{
-    // This is just to use socketready later and should probably be done once
-    // upon
-    // initialization and never again
-    /*SDLNet_SocketSet set;
-    set=SDLNet_AllocSocketSet(1);
-    SDLNet_TCP_AddSocket(set,TCPClient);
-  */
+void handleMP() {
     if (isHost) {
-        /*  int active = SDLNet_CheckSockets(set, 1);
-
-          //RECV
-          //if there was activity
-          if(active>0)
-          {
-              // and the client socket is ready
-              if(SDLNet_SocketReady(TCPClient))
-              {*/
         if (SDLNet_TCP_Recv(TCPClient, TCPBufferClt, 100) > 0) {
             char *temp[16];
 
@@ -612,11 +583,7 @@ void handleMP() // TCP introduction makes both sides crash when moving the
                 if (!hitStackPreventor.is_started()) {
                     if (temp[3][0] == '2') {
                         ball.getHit(player2);
-                        hitball = '1'; // send hitball = 1 back to confirm that
-                                       // ball was hit
-                        // TODO: prevent ball from getting hit twice due to
-                        // packet loss("recently hit ball" variable dependant
-                        // on timer?)
+                        hitball = '1';
                         hitStackPreventor.start();
                     }
                     if (temp[3][0] == '3') {
@@ -631,13 +598,11 @@ void handleMP() // TCP introduction makes both sides crash when moving the
                     }
                 }
                 if (hitStackPreventor.is_started() &&
-                    hitStackPreventor.get_ticks() > 500) {
+                    hitStackPreventor.get_ticks() > ball_hit_cooldown) {
                     hitStackPreventor.stop();
                 }
             }
         }
-        //}
-        //}
 
         char islethal;
         if (ball.lethal) {
@@ -647,34 +612,18 @@ void handleMP() // TCP introduction makes both sides crash when moving the
         }
 
         // SEND
-        sstream.str(""); // reset stream to empty TODO: send information to all players
+        sstream.str("");
         sstream << player.x << "," << player.y << "," << ball.x << "," << ball.y
                 << "," << islethal << "," << hitball << "," << player2.x << ","
                 << player2.y << "," << player3.x << "," << player3.y << ","
                 << player.alive << "\0";
-        hitball = '0'; // reset hitball
+        hitball = '0';
         string result = sstream.str();
-
-        /*if(playernumber > 2)
-        {
-            sendPac->address.host = Client3Adr.host;
-            sendPac->address.port = Client3Adr.port; //port# is wrong! its the
-        TCP
-        port number
-            SDLNet_UDP_Send(clientSocket, -1, sendPac);
-
-            if(playernumber > 3)
-            {
-                sendPac->address.host = Client4Adr.host;
-                sendPac->address.port = Client4Adr.port;
-                SDLNet_UDP_Send(clientSocket, -1, sendPac);
-            }
-        }*/
 
         SDLNet_TCP_Send(TCPClient, result.c_str(), strlen(result.c_str()) + 1);
     } else {
         // SEND
-        sstream.str(""); // reset stream to empty
+        sstream.str("");
         sstream << playernumber << "," << player.x << "," << player.y << "," << hitball << "," << player.alive << "\0";
         string result = sstream.str();
 
@@ -682,16 +631,7 @@ void handleMP() // TCP introduction makes both sides crash when moving the
             printf("SDLNet_CheckSockets: %s\n", SDLNet_GetError());
         }
 
-        // RECV
-        // int active = SDLNet_CheckSockets(set, 1);
-
-        /*   if(active>0)
-           {
-               // and the client socket is ready
-               if(SDLNet_SocketReady(TCPClient))
-               {*/
         if (SDLNet_TCP_Recv(TCPClient, TCPBufferClt, 100) > 0) {
-
             char *temp[12];
 
             temp[0] = strtok((char *)TCPBufferClt, ",");
@@ -700,14 +640,13 @@ void handleMP() // TCP introduction makes both sides crash when moving the
             temp[3] = strtok(NULL, ",");
             temp[4] = strtok(NULL, ",");
             temp[5] = strtok(NULL, ",");
-            temp[6] = strtok(NULL, ","); // server's player2 x
+            temp[6] = strtok(NULL, ",");
             temp[7] = strtok(NULL, ",");
-            temp[8] = strtok(NULL, ","); // server's player3 x
+            temp[8] = strtok(NULL, ",");
             temp[9] = strtok(NULL, ",");
             temp[10] = strtok(NULL, ",");
 
             if (playercount > 2) {
-
                 if (playernumber == 2) {
                     player3.x = atoi(temp[8]);
                     player3.y = atoi(temp[9]);
@@ -731,13 +670,10 @@ void handleMP() // TCP introduction makes both sides crash when moving the
                 ball.lethal = false;
             }
 
-            if (temp[5][0] == '1') // temp is an array of char arrays - fuck me
-            {
+            if (temp[5][0] == '1') {
                 hitball = '0';
             }
         }
-        // }
-        //  }
     }
 }
 
@@ -779,8 +715,7 @@ void update_tiles(Uint32 delta) {
 }
 
 void update_upgrade() {
-    if (!upgrade.active && UpgradeSpawner.get_ticks() > 10000) // if 10sec since last upgrade got taken
-    {
+    if (!upgrade.active && UpgradeSpawner.get_ticks() > 10000) {
         int ux = 0; // rand() % TILE_COUNT_X;
         int uy = rand() % TILE_COUNT_Y;
 
@@ -879,6 +814,10 @@ void update_ai(Uint32 delta) {
     }
 }
 
+bool is_player_hit(Player &player, Ball &ball) {
+    return ball.lethal && checkCollision(player.x, player.y, player.w, player.h, ball.x, ball.y, ball.w, ball.h);
+}
+
 void update_ball(Uint32 delta) {
     if (isHost) {
         ball.move(delta, ATiles);
@@ -887,8 +826,7 @@ void update_ball(Uint32 delta) {
         }
     }
 
-    // check for hit-by-ball
-    if (ball.lethal && checkCollision(player.x, player.y, player.w, player.h, ball.x, ball.y, ball.w, ball.h)) {
+    if (is_player_hit(player, ball)) {
         player.alive = false;
     }
 
@@ -900,10 +838,10 @@ void update_ball(Uint32 delta) {
 }
 
 void update_clickspamprevent0r() {
-    if (clickspamprevent0r.started && clickspamprevent0r.get_ticks() > 500) {
+    if (clickspamprevent0r.started && clickspamprevent0r.get_ticks() > ball_hit_cooldown) {
         clickspamprevent0r.stop();
     }
-    if (localmultiplayer && clickspamprevent0r2.started && clickspamprevent0r2.get_ticks() > 500) {
+    if (localmultiplayer && clickspamprevent0r2.started && clickspamprevent0r2.get_ticks() > ball_hit_cooldown) {
         clickspamprevent0r2.stop();
     }
 }
@@ -916,6 +854,180 @@ void update(Uint32 delta) {
     update_ball(delta);
     update_upgrade();
     update_clickspamprevent0r();
+}
+
+bool can_hit_ball(Player &player, Ball &ball, Timer &clickspamprevent0r) {
+    return abs(player.x + player.w / 2 - (ball.x + ball.w / 2)) <= 120 &&
+           abs(player.y + player.h / 2 - (ball.y + ball.h / 2)) <= 120 &&
+           (clickspamprevent0r.get_ticks() == 0 || clickspamprevent0r.get_ticks() > ball_hit_cooldown);
+}
+
+void process_input() {
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            running = false;
+        }
+        if (event.type == SDL_KEYDOWN) {
+            switch (event.key.keysym.sym) {
+            case SDLK_w:
+                if (localmultiplayer) {
+                    player2.velcapy = -(10 + player2.speedup);
+                    break;
+                }
+            case SDLK_UP:
+                player.velcapy = -(10 + player.speedup);
+                break;
+            case SDLK_s:
+                if (localmultiplayer) {
+                    player2.velcapy = 10 + player2.speedup;
+                    break;
+                }
+            case SDLK_DOWN:
+                player.velcapy = (10 + player.speedup);
+                break;
+            case SDLK_a:
+                if (localmultiplayer) {
+                    player2.velcapx = -(10 + player2.speedup);
+                    break;
+                }
+            case SDLK_LEFT:
+                player.velcapx = -(10 + player.speedup);
+                break;
+            case SDLK_d:
+                if (localmultiplayer) {
+                    player2.velcapx = (10 + player2.speedup);
+                    break;
+                }
+            case SDLK_RIGHT:
+                player.velcapx = (10 + player.speedup);
+                break;
+
+            case SDLK_SPACE:
+                if (localmultiplayer) {
+                    if (!clickspamprevent0r2.started) {
+                        clickspamprevent0r2.start();
+                    }
+
+                    if (abs(player2.x + player2.w / 2 - (ball.x + ball.w / 2)) <= 120 && abs(player2.y + player2.h / 2 - (ball.y + ball.h / 2)) <= 120 &&
+                        (clickspamprevent0r2.get_ticks() == 0 || clickspamprevent0r2.get_ticks() > ball_hit_cooldown)) { // half a second cd
+                        ball.getHit(player2);
+                    }
+                }
+                break;
+
+            // reset game state for SP
+            case SDLK_r:
+                if (localmultiplayer) {
+                    player.set(100, 270, DTS, DTS, 0, 0);
+                    player.alive = true;
+                    player2.set(1430, 270, DTS, DTS, 0, 0);
+                    player2.alive = true;
+                    ball.set(730, 500, DTS, DTS, 0, 0);
+                } else if (!multiplayer) {
+                    player.set(100, 270, DTS, DTS, 0, 0);
+                    player.alive = true;
+                    ai.set(1430, 270, DTS, DTS, 0, 0);
+                    ai.alive = true;
+                    ball.set(730, 500, DTS, DTS, 0, 0);
+                }
+                break;
+
+            case SDLK_ESCAPE:
+                running = false;
+                break;
+
+            case SDLK_c:
+                SDL_SetWindowFullscreen(window, SDL_FALSE);
+                break;
+            case SDLK_v:
+                SDL_SetWindowFullscreen(window, SDL_TRUE);
+                break;
+            }
+        }
+        if (event.type == SDL_KEYUP) {
+            switch (event.key.keysym.sym) {
+            case SDLK_w:
+                if (localmultiplayer) {
+                    if (player2.velcapy < 0) {
+                        player2.velcapy = 0;
+                    }
+                    break;
+                }
+            case SDLK_UP:
+                if (player.velcapy < 0) {
+                    player.velcapy = 0;
+                }
+                break;
+            case SDLK_s:
+                if (localmultiplayer) {
+                    if (player2.velcapy > 0) {
+                        player2.velcapy = 0;
+                    }
+                    break;
+                }
+            case SDLK_DOWN:
+                if (player.velcapy > 0) {
+                    player.velcapy = 0;
+                }
+                break;
+            case SDLK_a:
+                if (localmultiplayer) {
+                    if (player2.velcapx < 0) {
+                        player2.velcapx = 0;
+                    }
+                    break;
+                }
+            case SDLK_LEFT:
+                if (player.velcapx < 0) {
+                    player.velcapx = 0;
+                }
+                break;
+            case SDLK_d:
+                if (localmultiplayer) {
+                    if (player2.velcapx > 0) {
+                        player2.velcapx = 0;
+                    }
+                    break;
+                }
+            case SDLK_RIGHT:
+                if (player.velcapx > 0) {
+                    player.velcapx = 0;
+                }
+                break;
+            }
+        }
+        if (event.type == SDL_MOUSEMOTION) {
+            mousex = event.motion.x;
+            mousey = event.motion.y;
+        }
+
+        if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                mousex = event.button.x;
+                mousey = event.button.y;
+
+                if (!clickspamprevent0r.started) {
+                    clickspamprevent0r.start();
+                }
+
+                if (can_hit_ball(player, ball, clickspamprevent0r)) {
+                    if (isHost) {
+                        ball.getHit(player);
+                    } else {
+                        if (playernumber == 2) {
+                            hitball = '2';
+                        }
+                        if (playernumber == 3) {
+                            hitball = '3';
+                        }
+                        if (playernumber == 4) {
+                            hitball = '4';
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void run() {
@@ -1064,180 +1176,10 @@ void run() {
     while (running) {
         fps.start();
 
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = false;
-            }
-            if (event.type == SDL_KEYDOWN) {
-                switch (event.key.keysym.sym) {
-                case SDLK_w:
-                    if (localmultiplayer) {
-                        player2.velcapy = -(10 + player2.speedup);
-                        break;
-                    }
-                case SDLK_UP:
-                    player.velcapy = -(10 + player.speedup);
-                    break;
-                case SDLK_s:
-                    if (localmultiplayer) {
-                        player2.velcapy = 10 + player2.speedup;
-                        break;
-                    }
-                case SDLK_DOWN:
-                    player.velcapy = (10 + player.speedup);
-                    break;
-                case SDLK_a:
-                    if (localmultiplayer) {
-                        player2.velcapx = -(10 + player2.speedup);
-                        break;
-                    }
-                case SDLK_LEFT:
-                    player.velcapx = -(10 + player.speedup);
-                    break;
-                case SDLK_d:
-                    if (localmultiplayer) {
-                        player2.velcapx = (10 + player2.speedup);
-                        break;
-                    }
-                case SDLK_RIGHT:
-                    player.velcapx = (10 + player.speedup);
-                    break;
-
-                case SDLK_SPACE:
-                    if (localmultiplayer) {
-                        if (!clickspamprevent0r2.started) {
-                            clickspamprevent0r2.start();
-                        }
-
-                        if (abs(player2.x + player2.w / 2 - (ball.x + ball.w / 2)) <= 120 && abs(player2.y + player2.h / 2 - (ball.y + ball.h / 2)) <= 120 &&
-                            (clickspamprevent0r2.get_ticks() == 0 || clickspamprevent0r2.get_ticks() > 500)) { // half a second cd
-                            ball.getHit(player2);
-                        }
-                    }
-                    break;
-
-                // reset game state for SP
-                case SDLK_r:
-                    if (localmultiplayer) {
-                        player.set(100, 270, DTS, DTS, 0, 0);
-                        player.alive = true;
-                        player2.set(1430, 270, DTS, DTS, 0, 0);
-                        player2.alive = true;
-                        ball.set(730, 500, DTS, DTS, 0, 0);
-                    } else if (!multiplayer) {
-                        player.set(100, 270, DTS, DTS, 0, 0);
-                        player.alive = true;
-                        ai.set(1430, 270, DTS, DTS, 0, 0);
-                        ai.alive = true;
-                        ball.set(730, 500, DTS, DTS, 0, 0);
-                    }
-                    break;
-
-                case SDLK_ESCAPE:
-                    running = false;
-                    break;
-
-                case SDLK_c:
-                    SDL_SetWindowFullscreen(window, SDL_FALSE);
-                    break;
-                case SDLK_v:
-                    SDL_SetWindowFullscreen(window, SDL_TRUE);
-                    break;
-                }
-            }
-            if (event.type == SDL_KEYUP) {
-                switch (event.key.keysym.sym) {
-                case SDLK_w:
-                    if (localmultiplayer) {
-                        if (player2.velcapy < 0) {
-                            player2.velcapy = 0;
-                        }
-                        break;
-                    }
-                case SDLK_UP:
-                    if (player.velcapy < 0) {
-                        player.velcapy = 0;
-                    }
-                    break;
-                case SDLK_s:
-                    if (localmultiplayer) {
-                        if (player2.velcapy > 0) {
-                            player2.velcapy = 0;
-                        }
-                        break;
-                    }
-                case SDLK_DOWN:
-                    if (player.velcapy > 0) {
-                        player.velcapy = 0;
-                    }
-                    break;
-                case SDLK_a:
-                    if (localmultiplayer) {
-                        if (player2.velcapx < 0) {
-                            player2.velcapx = 0;
-                        }
-                        break;
-                    }
-                case SDLK_LEFT:
-                    if (player.velcapx < 0) {
-                        player.velcapx = 0;
-                    }
-                    break;
-                case SDLK_d:
-                    if (localmultiplayer) {
-                        if (player2.velcapx > 0) {
-                            player2.velcapx = 0;
-                        }
-                        break;
-                    }
-                case SDLK_RIGHT:
-                    if (player.velcapx > 0) {
-                        player.velcapx = 0;
-                    }
-                    break;
-                }
-            }
-            if (event.type == SDL_MOUSEMOTION) {
-                // Get the mouse offsets
-                mousex = event.motion.x;
-                mousey = event.motion.y;
-            }
-            // If a mouse button was pressed
-            if (event.type == SDL_MOUSEBUTTONDOWN) {
-                // If the left mouse button was pressed
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    // Get the mouse offsets
-                    mousex = event.button.x;
-                    mousey = event.button.y;
-
-                    // implementing cd on clicking
-                    if (!clickspamprevent0r.started) {
-                        clickspamprevent0r.start();
-                    }
-
-                    // hit the ball if in range and not on cd
-                    if (abs(player.x + player.w / 2 - (ball.x + ball.w / 2)) <= 120 && abs(player.y + player.h / 2 - (ball.y + ball.h / 2)) <= 120 &&
-                        (clickspamprevent0r.get_ticks() == 0 || clickspamprevent0r.get_ticks() > 500)) { // half a second cd
-                        if (isHost) {
-                            ball.getHit(player);
-                        } else {
-                            if (playernumber == 2) {
-                                hitball = '2'; //(char) playernumber doesnt work T_T
-                            }
-                            if (playernumber == 3) {
-                                hitball = '3';
-                            }
-                            if (playernumber == 4) {
-                                hitball = '4';
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        process_input();
 
         update(delta.get_ticks());
-        delta.start(); // restart timer
+        delta.start();
 
         if (multiplayer) {
             handleMP();
