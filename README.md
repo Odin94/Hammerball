@@ -12,3 +12,10 @@ Unpack the 64bit version (has to match your mingw installation) of the following
 * SDL_image (https://www.libsdl.org/projects/SDL_image/ SDL2_image-devel-2.0.5-mingw.tar.gz)
 * SDL_ttf (https://www.libsdl.org/projects/SDL_ttf/ SDL2_ttf-devel-2.0.15-mingw.tar.gz)
 * SDL_mixer(https://www.libsdl.org/projects/SDL_mixer/ SDL2_mixer-devel-2.0.4-mingw.tar.gz)
+
+
+## Planned Features
+* Visual and/or audio cue when ball is in hitting range
+* Visual cue for ball hitting cooldown
+* Fix multiplayer
+* Make upgrades work
